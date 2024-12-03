@@ -1,3 +1,5 @@
+import java.net.URI
+
 val kotlin_version = "2.1.0"
 val ktor_version = "3.0.1"
 val logback_version = "1.4.14"
@@ -19,6 +21,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven { url = URI("https://jitpack.io") }
 }
 
 dependencies {
@@ -33,8 +36,11 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
 
+    implementation("io.ktor:ktor-server-request-validation-jvm:$ktor_version")
+
     //ktor third party plugins
     implementation("io.github.hmiyado:ktor-csrf-protection:2.0.1")
+    implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
 

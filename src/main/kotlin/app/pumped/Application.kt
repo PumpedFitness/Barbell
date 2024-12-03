@@ -22,4 +22,6 @@ fun Application.module() {
     configureCSRF()
     configureSessions()
     configureRouting()
+    configureValidation()
+    configureMiddleware()
 }
