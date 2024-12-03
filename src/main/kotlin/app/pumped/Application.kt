@@ -16,6 +16,9 @@ fun main() {
  * Configure KTOR
  */
 fun Application.module() {
+    configureSerialization()
     configureSecurity()
+    configureCSRF()
+    configureSessions()
     configureRouting()
 }
