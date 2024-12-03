@@ -1,10 +1,9 @@
-package app.pumped
+package app.pumped.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.application.*
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonBuilder
 
 fun Application.configureSerialization() {
     install(ContentNegotiation) {

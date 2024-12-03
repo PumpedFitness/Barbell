@@ -1,5 +1,6 @@
 package app.pumped
 
+import app.pumped.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*

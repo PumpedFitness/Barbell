@@ -1,4 +1,4 @@
-package app.pumped
+package app.pumped.plugins
 
 import io.github.hmiyado.ktor.csrfprotection.Csrf
 import io.github.hmiyado.ktor.csrfprotection.header

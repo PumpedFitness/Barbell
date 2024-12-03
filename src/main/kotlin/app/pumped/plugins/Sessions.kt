@@ -1,4 +1,4 @@
-package app.pumped
+package app.pumped.plugins
 
 import io.github.hmiyado.ktor.csrfprotection.CsrfTokenBoundClient
 import io.github.hmiyado.ktor.csrfprotection.CsrfTokenSession
