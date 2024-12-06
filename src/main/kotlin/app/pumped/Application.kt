@@ -1,5 +1,6 @@
 package app.pumped
 
+import app.pumped.persistance.configureDatabase
 import app.pumped.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
@@ -18,10 +19,12 @@ fun main() {
  */
 fun Application.module() {
     configureEnv()
+    configureDatabase()
     configureSerialization()
     configureSecurity()
     configureCSRF()
     configureSessions()
+    configureTaskScheduling()
     configureRouting()
     configureValidation()
     configureMiddleware()

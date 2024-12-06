@@ -1,0 +1,62 @@
+networks:
+  app-tier:
+
+
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+    environment:
+      BB_PROGRAM_SCOPE: "DEPLOY"
+      BB_DB_USER: ${BB_DB_USER}
+      BB_DB_PASSWORD: ${BB_DB_PASSWORD}
+      BB_DB_HOST: ${BB_DB_HOST}
+      BB_DB_PORT: ${BB_DB_PORT}
+      BB_DB_DATABASE: ${BB_DB_DATABASE}
+      BB_REDIS_HOST: ${BB_REDIS_HOST}
+      BB_REDIS_PORT: ${BB_REDIS_PORT}
+      BB_REDIS_PASSWORD: ${BB_REDIS_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - app-tier
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - ${BB_DB_PORT}:${BB_DB_PORT}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${BB_DB_PASSWORD}
+      POSTGRES_USER: ${BB_DB_USER}
+      POSTGRES_DB: ${BB_DB_DATABASE}
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+    networks:
+      - app-tier
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BB_DB_USER} -d ${BB_DB_DATABASE} -h localhost || exit 1"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    command:
+      - postgres
+      - -c
+      - "listen_addresses=*"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    networks:
+      - app-tier
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s

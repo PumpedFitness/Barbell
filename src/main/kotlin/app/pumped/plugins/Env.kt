@@ -3,11 +3,11 @@ package app.pumped.plugins
 import app.pumped.io.env.Env
 import io.ktor.server.application.*
 
-private lateinit var lateEnv: Env
+lateinit var globalEnv: Env
 
 fun Application.configureEnv() {
-    lateEnv = Env(this.log)
+    globalEnv = Env(this.log)
 }
 
 val Application.env
-    get() = lateEnv
+    get() = globalEnv

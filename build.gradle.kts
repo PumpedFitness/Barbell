@@ -47,6 +47,8 @@ dependencies {
     //ktor third party plugins
     implementation("io.github.hmiyado:ktor-csrf-protection:2.0.1")
     implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
+    implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.1.1")
+    implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.1.1")
 
     //Database
     implementation("com.zaxxer:HikariCP:6.2.1")
@@ -54,7 +56,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
-
+    implementation("org.postgresql:postgresql:42.1.4")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
