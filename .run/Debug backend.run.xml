@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Debug backend" type="CompoundRunConfigurationType">
+    <toRun name="backend [clean]" type="GradleRunConfiguration" />
+    <toRun name="Debugger" type="KtorApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -13,17 +13,5 @@ fun Application.configureTaskScheduling() {
             this.port = env[EnvVariables.BB_REDIS_PORT].toInt()
             this.password = env[EnvVariables.BB_REDIS_PASSWORD]
         }
-
-        task {
-            kronSchedule = {
-                seconds {
-                    every(15)
-                }
-            }
-
-            task = {
-                log.info("Running at ${it.seconds} second")
-            }
-        }
     }
 }

@@ -9,6 +9,7 @@ plugins {
     kotlin("jvm") version "2.1.0"
     id("io.ktor.plugin") version "3.0.1"
     kotlin("plugin.serialization") version "2.1.0"
+    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
 }
 
 group = "app.pumped"
@@ -56,7 +57,13 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
-    implementation("org.postgresql:postgresql:42.1.4")
+    implementation("org.postgresql:postgresql:42.7.2")
+
+    //kser
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("com.github.StaticFX.kotlin-exposed-relationships:annotations:1.0.4")
+    ksp("com.github.StaticFX.kotlin-exposed-relationships:processor:1.0.4")
+
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")

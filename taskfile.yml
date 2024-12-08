@@ -1,0 +1,33 @@
+version: '3'
+
+tasks:
+  dev:
+    desc: Run the development environment
+    cmds:
+      - docker compose --env-file .env -f deployment/docker-compose.dev.yml up --build -d
+
+  dev-down:
+    desc: Stop the development environment
+    cmds:
+      - docker compose -f deployment/docker-compose.dev.yml down
+
+  prod:
+    desc: Run the production environment
+    cmds:
+      - docker-compose -f deployment/docker-compose.prod.yml up --build -d
+
+  prod-down:
+    desc: Stop the production environment
+    cmds:
+      - docker-compose -f deployment/docker-compose.prod.yml down
+
+  logs:
+    desc: Tail logs of the application
+    cmds:
+      - docker-compose logs -f
+
+  clean:
+    desc: Clean up all containers, networks, and volumes
+    cmds:
+      - docker-compose -f deployment/docker-compose.dev.yml down --volumes
+      - docker-compose -f deployment/docker-compose.prod.yml down --volumes
