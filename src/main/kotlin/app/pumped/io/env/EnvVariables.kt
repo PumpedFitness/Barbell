@@ -10,6 +10,7 @@ enum class EnvVariables(
     BB_PROGRAM_SCOPE(EnvType.STRING),
 
     BB_JWT_SECRET(EnvType.STRING),
+    BB_JWT_EXPIRES(EnvType.LONG),
 
     BB_DB_USER(EnvType.STRING),
     BB_DB_PASSWORD(EnvType.STRING),

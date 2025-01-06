@@ -9,16 +9,18 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.Instant
+import java.time.temporal.TemporalUnit
+import java.util.concurrent.TimeUnit
 
 fun Application.configureSecurity() {
     // Please read the jwt property from the config file if you are using EngineMain
-    val jwtAudience = "jwt-audience"
+    val jwtAudience = "jwt"
     val jwtDomain = "https://pumped.fitness"
     val jwtRealm = "pumped"
     val jwtSecret = env[EnvVariables.BB_JWT_SECRET]
     authentication {
-        jwt {
+        jwt("jwt") {
             realm = jwtRealm
             verifier(
                 JWT
@@ -38,6 +40,8 @@ class JWTService: Service {
 
     fun createJWTToken(user: User): String {
         return JWT.create()
-            .withClaim("","").sign(Algorithm.HMAC256(globalEnv[EnvVariables.BB_JWT_SECRET]))
+            .withClaim("user_id", user.id.value.toString())
+            .withExpiresAt(Instant.now().plusSeconds(globalEnv[EnvVariables.BB_JWT_EXPIRES].toLong()))
+            .sign(Algorithm.HMAC256(globalEnv[EnvVariables.BB_JWT_SECRET]))
     }
 }

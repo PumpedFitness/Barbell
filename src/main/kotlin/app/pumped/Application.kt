@@ -19,6 +19,7 @@ fun main() {
  */
 fun Application.module() {
     configureEnv()
+    configureDoubleReceive()
     configureDatabase()
     configureSerialization()
     configureSecurity()

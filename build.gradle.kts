@@ -40,6 +40,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
 
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
+    implementation("io.ktor:ktor-server-double-receive:$ktor_version")
 
     implementation("io.ktor:ktor-server-sessions:$ktor_version")
 
@@ -71,7 +72,8 @@ dependencies {
     implementation("com.github.StaticFX.kotlin-exposed-relationships:annotations:1.0.6")
     ksp("com.github.StaticFX.kotlin-exposed-relationships:processor:1.0.6")
 
-
+    //util
+    implementation("at.favre.lib:bcrypt:0.10.2")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
 
