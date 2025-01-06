@@ -21,6 +21,7 @@ fun Application.module() {
     configureEnv()
     configureDoubleReceive()
     configureDatabase()
+    configureStatusPages()
     configureSerialization()
     configureSecurity()
     configureKoin()
