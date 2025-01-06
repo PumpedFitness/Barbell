@@ -10,7 +10,6 @@
    1. > this will start the required databases inside a docker compose based on the .env
 4. Run one of the predefined run configurations in IntelliJ
    1. `start backend` will start the backend in a default configuration
-   2. 
 5. To stop the docker containers use `task dev-down`
 
 ## Run prod

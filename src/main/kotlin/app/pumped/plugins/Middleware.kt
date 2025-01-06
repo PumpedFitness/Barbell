@@ -1,18 +1,24 @@
 package app.pumped.plugins
 
+import app.pumped.data.context.KoinRouteContext
+import app.pumped.data.context.RouteContext
 import io.ktor.server.application.*
-import statix.org.Middleware
-import statix.org.MiddlewareData
-import statix.org.Middlewares
+import org.koin.ktor.ext.getKoin
+import statix.org.*
 
 fun Application.configureMiddleware() {
     install(Middlewares) {
-        this.middleware = EmptyMiddleware()
+        this.middleware = globalMiddleware
     }
 }
 
-private class EmptyMiddleware(): Middleware {
+private val globalMiddleware = middlewareGroup {
+    this += ContextMiddleware()
+}
+
+private class ContextMiddleware: Middleware {
     override suspend fun handleCall(call: ApplicationCall, receives: MiddlewareData?): MiddlewareData {
+        call.getKoin().createScope<RouteContext>(Scope.CALL_PIPELINE.value, KoinRouteContext(call))
         return MiddlewareData.empty()
     }
 }
