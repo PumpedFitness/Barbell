@@ -1,10 +1,10 @@
 import java.net.URI
 
 val kotlin_version = "2.1.0"
-val ktor_version = "3.0.1"
+val ktor_version = "3.0.3"
 val logback_version = "1.4.14"
 val exposedVersion = "0.56.0"
-val koin_version = "4.0.1"
+val koin_version = "4.1.0-Beta3"
 
 plugins {
     kotlin("jvm") version "2.1.0"
@@ -55,7 +55,7 @@ dependencies {
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.1.1")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.1.1")
     implementation(project.dependencies.platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-ktor:$koin_version")
+    implementation("io.insert-koin:koin-ktor3:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
     implementation("io.insert-koin:koin-core")
 
