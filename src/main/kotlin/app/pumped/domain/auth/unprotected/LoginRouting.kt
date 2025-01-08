@@ -1,6 +1,8 @@
 package app.pumped.domain.auth.unprotected
 
 import app.pumped.api.requests.auth.LoginRequest
+import app.pumped.api.requests.auth.RegisterRequest
+import app.pumped.domain.user.User
 import app.pumped.domain.user.UserRepository
 import app.pumped.plugins.JWTService
 import at.favre.lib.crypto.bcrypt.BCrypt
@@ -25,14 +27,27 @@ fun Route.loginRouting() {
         call.respond("token" to token)
     }
 
-    post("/register") {
+    post<RegisterRequest>("/register") {
         /*
         TODO: David
         - 1 RegisterRequest bauen
         - 2 Nötige sachen prüfen -> email unique und son zeugs (validator)
 
          */
-        //
+        val userRepository by inject<UserRepository>()
+
+        val encryptedPassword = BCrypt.withDefaults().hashToString(0,it.password.toCharArray()) //Unsure if cost 0 is correct
+
+        val user = User.new {
+            this.email = it.email
+            this.password = encryptedPassword
+        }
+
+        userRepository.insert(user)
+
+        val jwtService by inject<JWTService>()
+        val token = jwtService.createJWTToken(user)
+        call.respond("token" to token)
     }
 
 
