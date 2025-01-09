@@ -17,3 +17,5 @@
 1. Install [taskfile](https://taskfile.dev/installation/)
    1. For npm use `npm install -g @go-task/cli`
 2. Run `task prod`
+
+3. Hello World
