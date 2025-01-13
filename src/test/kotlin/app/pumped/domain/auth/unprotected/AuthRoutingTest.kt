@@ -1,5 +1,6 @@
 package app.pumped.domain.auth.unprotected
 
+import app.pumped.api.requests.auth.LoginRequest
 import app.pumped.api.requests.auth.RegisterRequest
 import app.pumped.domain.user.UserRepository
 import app.pumped.domain.user.Users
@@ -31,7 +32,7 @@ class AuthRoutingTest {
     }
 
     @Test
-    fun testRegistration() =
+    fun testRegistrationandLogin() =
         testApplication {
             application {
                 module(false)
@@ -44,7 +45,7 @@ class AuthRoutingTest {
                     }
                 }
 
-            val request =
+            val registerRequest =
                 RegisterRequest(
                     "email@email.com",
                     "xXuser_|_nameXx",
@@ -52,20 +53,36 @@ class AuthRoutingTest {
                     true,
                 )
 
-            val response =
+            val registerResponse =
                 client.post("/api/v1/auth/register") {
                     contentType(ContentType.Application.Json)
                     setBody(
-                        request,
+                        registerRequest,
                     )
                 }
 
-            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(HttpStatusCode.OK, registerResponse.status)
 
             val userRepository by inject<UserRepository>(UserRepository::class.java)
 
-            val user = userRepository.getByEmail(request.email)!!
+            val user = userRepository.getByEmail(registerRequest.email)!!
 
-            assertTrue(BCrypt.verifyer().verify(request.password.toByteArray(), user.password.toByteArray()).verified)
+            assertTrue(BCrypt.verifyer().verify(registerRequest.password.toByteArray(), user.password.toByteArray()).verified)
+
+            val loginRequest =
+                LoginRequest(
+                    "email@email.com",
+                    "securepassword",
+                    true,
+                )
+
+            val loginResponse =
+                client.post("/api/v1/auth/login") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        loginRequest,
+                    )
+                }
+            assertEquals(HttpStatusCode.OK, loginResponse.status)
         }
 }
