@@ -9,8 +9,10 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 import java.time.temporal.TemporalUnit
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun Application.configureSecurity() {
@@ -37,11 +39,17 @@ fun Application.configureSecurity() {
 }
 
 class JWTService: Service {
-
     fun createJWTToken(user: User): String {
         return JWT.create()
             .withClaim("user_id", user.id.value.toString())
             .withExpiresAt(Instant.now().plusSeconds(globalEnv[EnvVariables.BB_JWT_EXPIRES].toLong()))
             .sign(Algorithm.HMAC256(globalEnv[EnvVariables.BB_JWT_SECRET]))
     }
+}
+
+fun ApplicationCall.user(): User? {
+    val principal = principal<JWTPrincipal>() ?: return null
+    val userRawID = principal.getClaim("user_id", String::class) ?: return null
+    val userID = UUID.fromString(userRawID)
+    return transaction { User.findById(userID) }
 }

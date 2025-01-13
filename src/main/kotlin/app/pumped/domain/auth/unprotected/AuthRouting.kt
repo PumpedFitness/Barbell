@@ -2,8 +2,11 @@ package app.pumped.domain.auth.unprotected
 
 import app.pumped.api.requests.auth.LoginRequest
 import app.pumped.api.requests.auth.RegisterRequest
+import app.pumped.api.responses.auth.LoginResponse
+import app.pumped.api.responses.auth.RegisterResponse
 import app.pumped.domain.user.User
 import app.pumped.domain.user.UserRepository
+import app.pumped.domain.user.generated.toModel
 import app.pumped.plugins.JWTService
 import at.favre.lib.crypto.bcrypt.BCrypt
 import io.ktor.http.*
@@ -27,24 +30,22 @@ fun Route.authRouting() {
 
         val jwtService by inject<JWTService>()
         val token = jwtService.createJWTToken(user)
-        call.respond("token" to token)
+        call.respond(LoginResponse(token))
     }
 
     post<RegisterRequest>("/register") {
         val hashedPassword = BCrypt.withDefaults().hashToString(12, it.password.toCharArray())
         val jwtService by inject<JWTService>()
 
-        transaction {
-            val user =
-                User.new {
-                    this.username = it.username
-                    this.email = it.email
-                    this.password = hashedPassword
-                }
-            val token = jwtService.createJWTToken(user)
-            runBlocking {
-                call.respond("token" to token)
+        val user = transaction {
+            User.new {
+                this.username = it.username
+                this.email = it.email
+                this.password = hashedPassword
             }
         }
+
+        val token = jwtService.createJWTToken(user)
+        call.respond(RegisterResponse(token, user.toModel()))
     }
 }

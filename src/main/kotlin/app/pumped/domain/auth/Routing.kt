@@ -1,5 +1,6 @@
 package app.pumped.domain.auth
 
+import app.pumped.domain.auth.protected.protectedAuthRouting
 import app.pumped.domain.auth.unprotected.authRouting
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
@@ -15,7 +16,4 @@ private fun Route.unprotectedAuthRouting() {
     authRouting()
 }
 
-private fun Route.protectedAuthRouting() {
-    authenticate("jwt") {
-    }
-}
+
