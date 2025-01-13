@@ -17,10 +17,12 @@ fun main() {
 /**
  * Configure KTOR
  */
-fun Application.module() {
+fun Application.module(startDB: Boolean = true) {
     configureEnv()
     configureDoubleReceive()
-    configureDatabase()
+    if (startDB) {
+        configureDatabase()
+    }
     configureStatusPages()
     configureSerialization()
     configureSecurity()

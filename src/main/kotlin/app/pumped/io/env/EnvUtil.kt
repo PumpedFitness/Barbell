@@ -5,7 +5,7 @@ import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.*
 import io.ktor.util.logging.*
 
-val mode: ProgramScope = ProgramScope.valueOf(System.getenv(EnvVariables.BB_PROGRAM_SCOPE.toString()))
+val mode: ProgramScope = ProgramScope.valueOf(System.getenv(EnvVariables.BB_PROGRAM_SCOPE.toString()) ?: "DEV")
 
 /**
  * Util class to access values from the provided environment.
@@ -18,7 +18,9 @@ val mode: ProgramScope = ProgramScope.valueOf(System.getenv(EnvVariables.BB_PROG
  *
  * To add more entries to load from, adjust [EnvVariables]
  */
-class Env(private val logger: Logger) {
+class Env(
+    private val logger: Logger,
+) {
     private var dotenv: Dotenv? = null
 
     init {
@@ -46,9 +48,8 @@ class Env(private val logger: Logger) {
                 value.default
                     ?: (getOrNull(value.name) ?: error("Key ${value.name} not found in environment"))
 
-
             if (!value.type.typeCheck(envValue)) {
-                error("Can't cast ${value.name} to ${value.type.toString()}")
+                error("Can't cast ${value.name} to ${value.type}")
             }
 
             if (value.requiresNonEmpty && envValue.isEmpty()) {

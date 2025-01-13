@@ -12,11 +12,13 @@ import org.koin.java.KoinJavaComponent.inject
  * @author David Damm
  */
 @Serializable
-data class RegisterRequest(val email: String, val password: String, @SerialName("remember_me") val rememberMe: Boolean):
-    APIRequest {
-
+data class RegisterRequest(
+    val email: String,
+    val password: String,
+    @SerialName("remember_me") val rememberMe: Boolean,
+) : APIRequest {
     override fun validate(): ValidationResult {
-        val userRepository by inject<UserRepository>(UserRepository::class.java) //Maybe this cause problem?
+        val userRepository by inject<UserRepository>(UserRepository::class.java)
 
         if (!isEmailValid(email)) {
             return ValidationResult.Invalid("Email is not valid!")

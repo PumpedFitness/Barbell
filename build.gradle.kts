@@ -49,7 +49,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-request-validation-jvm:$ktor_version")
 
-    //ktor third party plugins
+    // ktor third party plugins
     implementation("io.github.hmiyado:ktor-csrf-protection:2.0.1")
     implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.1.1")
@@ -59,7 +59,7 @@ dependencies {
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
     implementation("io.insert-koin:koin-core")
 
-    //Database
+    // Database
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -67,18 +67,20 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.postgresql:postgresql:42.7.2")
 
-    //kser
+    // kser
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("com.github.StaticFX.kotlin-exposed-relationships:annotations:1.0.6")
     ksp("com.github.StaticFX.kotlin-exposed-relationships:processor:1.0.6")
 
-    //util
+    // util
     implementation("at.favre.lib:bcrypt:0.10.2")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
 
-    //testing
+    // testing
+    testImplementation("com.h2database:h2:2.2.224")
     testImplementation("io.ktor:ktor-server-test-host-jvm")
+    testImplementation("io.ktor:ktor-client-content-negotiation:2.1.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
 
