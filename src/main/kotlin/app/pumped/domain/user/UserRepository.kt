@@ -1,22 +1,15 @@
 package app.pumped.domain.user
 
-import app.pumped.api.requests.auth.LoginRequest
 import app.pumped.domain.Repository
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
-class UserRepository: Repository<UUID, User> {
-    override fun getAll(): List<User> {
-        return transaction { User.all().toList() }
-    }
+class UserRepository : Repository<UUID, User> {
+    override fun getAll(): List<User> = transaction { User.all().toList() }
 
-    override fun get(key: UUID): User? {
-        return transaction { User.findById(key) }
-    }
+    override fun get(key: UUID): User? = transaction { User.findById(key) }
 
-    fun getByEmail(email: String): User? {
-        return transaction { User.find { Users.email eq email }.firstOrNull() }
-    }
+    fun getByEmail(email: String): User? = transaction { User.find { Users.email eq email }.firstOrNull() }
 
     override fun insert(entity: User) {
         transaction {

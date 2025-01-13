@@ -45,6 +45,7 @@ class AuthRoutingTest {
                     setBody(
                         RegisterRequest(
                             "email@email.com",
+                            "xXuser_|_nameXx",
                             "securepassword",
                             true,
                         ),

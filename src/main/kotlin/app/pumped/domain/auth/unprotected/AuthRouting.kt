@@ -37,6 +37,7 @@ fun Route.authRouting() {
         transaction {
             val user =
                 User.new {
+                    this.username = it.username
                     this.email = it.email
                     this.password = hashedPassword
                 }

@@ -14,6 +14,7 @@ import org.koin.java.KoinJavaComponent.inject
 @Serializable
 data class RegisterRequest(
     val email: String,
+    val username: String,
     val password: String,
     @SerialName("remember_me") val rememberMe: Boolean,
 ) : APIRequest {
