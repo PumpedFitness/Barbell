@@ -18,4 +18,8 @@ object Sets : UUIDTable() {
 class Set(id: EntityID<UUID>): Entity<UUID>(id) {
     companion object : EntityClass<UUID, Set>(Sets)
 
+    val workoutExercise by Sets.workoutExercise
+    val number by Sets.number
+    val repetitions by Sets.repetitions
+    val weight by Sets.weight
 }
