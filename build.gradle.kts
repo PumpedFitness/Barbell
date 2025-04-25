@@ -75,6 +75,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
 
+    implementation("io.insert-koin:koin-ktor:4.0.0")
+    implementation("io.insert-koin:koin-logger-slf4j:4.0.0")
+
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

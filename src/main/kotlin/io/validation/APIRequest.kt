@@ -5,7 +5,7 @@ import io.ktor.server.plugins.requestvalidation.*
 /**
  * @author Devin Fritz
  */
-interface APIRequest {
+fun interface APIRequest {
 
     /**
      * Validates this request

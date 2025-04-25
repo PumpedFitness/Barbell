@@ -32,7 +32,7 @@ Here are some useful links to get you started:
 Here's a list of features included in this project:
 
 | Name                                                                   | Description                                                                        |
-| ------------------------------------------------------------------------|------------------------------------------------------------------------------------ |
+|------------------------------------------------------------------------|------------------------------------------------------------------------------------|
 | [CORS](https://start.ktor.io/p/cors)                                   | Enables Cross-Origin Resource Sharing (CORS)                                       |
 | [Default Headers](https://start.ktor.io/p/default-headers)             | Adds a default set of headers to HTTP responses                                    |
 | [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
@@ -43,7 +43,7 @@ Here's a list of features included in this project:
 | [Authentication JWT](https://start.ktor.io/p/auth-jwt)                 | Handles JSON Web Token (JWT) bearer authentication scheme                          |
 | [Request Validation](https://start.ktor.io/p/request-validation)       | Adds validation for incoming requests                                              |
 | [Resources](https://start.ktor.io/p/resources)                         | Provides type-safe routing                                                         |
-| [Status Pages](https://start.ktor.io/p/status-pages)                   | Provides exception handling for routes                                             |
+| [Status Pages](https://start.ktor.io/p/status-pages)                   | Provides exception handling for route                                              |
 | [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
 | [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
 | [Exposed](https://start.ktor.io/p/exposed)                             | Adds Exposed database to your application                                          |

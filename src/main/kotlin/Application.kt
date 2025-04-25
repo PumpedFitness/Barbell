@@ -18,6 +18,7 @@ fun Application.module(testing: Boolean = false) {
 
     configureDatabases(testing)
 
+    configureKoin()
     configureHTTP()
     configureSecurity()
     configureSerialization()
