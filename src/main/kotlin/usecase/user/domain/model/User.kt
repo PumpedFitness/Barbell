@@ -9,8 +9,6 @@ data class User(
     var username: String,
     var password: String,
     var email: String,
-    val description: String? = "",
-    val profilePicture: String? = "",
     val createdAt: Instant = Clock.System.now(),
     var updatedAt: Instant = Clock.System.now()
 )
