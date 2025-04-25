@@ -1,5 +1,6 @@
 package ord.pumped.usecase.user.domain.service
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
 import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.persistence.repository.UserRepository
@@ -12,6 +13,8 @@ class UserServiceAdapter : IUserService, KoinComponent {
     val userModelMapper: UserModelMapper by inject()
 
     override fun registerUser(receiveAPIRequest: User): User {
+        receiveAPIRequest.password = BCrypt.withDefaults()
+            .hashToString(12, receiveAPIRequest.password.toCharArray())
         val savedUser = userRepository.save(receiveAPIRequest)
         return userModelMapper.toDomain(savedUser)
     }
