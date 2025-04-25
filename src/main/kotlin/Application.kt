@@ -23,6 +23,7 @@ fun Application.module(testing: Boolean = false) {
     configureSecurity()
     configureSerialization()
     configureAdministration()
+    configureAkkurate()
     configureRouting()
     configureRoutes()
     configureMiddlewares()
