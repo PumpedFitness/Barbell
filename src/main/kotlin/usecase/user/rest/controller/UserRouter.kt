@@ -1,6 +1,7 @@
 package ord.pumped.usecase.user.rest.controller
 
 import io.ktor.http.*
+import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ord.pumped.io.validation.receiveAPIRequest
@@ -11,7 +12,7 @@ fun Route.userRouting() {
     route("/user") {
         post("/register") {
             val response = UserController.registerUser(
-                call.receiveAPIRequest<UserRegisterRequest>()
+                call.receive<UserRegisterRequest>()
             )
 
             call.respond(HttpStatusCode.Created, response)
