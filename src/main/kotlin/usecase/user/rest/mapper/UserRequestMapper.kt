@@ -4,6 +4,7 @@ import ord.pumped.common.mapping.IRouteMapper
 import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
+import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRequestMapper : IRouteMapper<UserRegisterRequest, UserRegisterResponse, User> {
     override fun toDomain(userRequest: UserRegisterRequest): User {
@@ -16,6 +17,16 @@ class UserRequestMapper : IRouteMapper<UserRegisterRequest, UserRegisterResponse
     }
 
     override fun toResponse(dto: User): UserRegisterResponse {
-        TODO("Not yet implemented")
+        return transaction {
+            UserRegisterResponse(
+                //DEBUG
+                id = dto.id!!.toString(),
+
+                username = dto.username,
+                email = dto.email,
+                createdAt = dto.createdAt,
+                updatedAt = dto.updatedAt
+            )
+        }
     }
 }

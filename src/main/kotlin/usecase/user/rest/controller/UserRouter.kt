@@ -10,11 +10,11 @@ import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 fun Route.userRouting() {
     route("/user") {
         post("/register") {
-            UserController.registerUser(
+            val response = UserController.registerUser(
                 call.receiveAPIRequest<UserRegisterRequest>()
             )
 
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.Created, response)
         }
     }
 }

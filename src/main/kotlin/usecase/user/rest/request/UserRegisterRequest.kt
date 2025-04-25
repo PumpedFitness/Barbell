@@ -2,7 +2,9 @@ package ord.pumped.usecase.user.rest.request
 
 import io.ktor.server.plugins.requestvalidation.*
 import io.validation.APIRequest
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UserRegisterRequest(
     val username: String,
     val password: String,
