@@ -12,6 +12,7 @@ plugins {
     id("io.ktor.plugin") version "3.1.2"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
     id("org.flywaydb.flyway") version "10.11.0"
+    id("com.google.devtools.ksp") version "2.1.20-1.0.32"
 }
 
 repositories {
@@ -78,11 +79,11 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:4.0.0")
     implementation("io.insert-koin:koin-logger-slf4j:4.0.0")
 
+    implementation("dev.nesk.akkurate:akkurate-ktor-server:0.11.0")
+    implementation("dev.nesk.akkurate:akkurate-core:0.11.0")
+    ksp("dev.nesk.akkurate:akkurate-ksp-plugin:0.11.0")
+
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-}
-
-tasks.test {
-    dependsOn("flywayTestMigrate")
 }

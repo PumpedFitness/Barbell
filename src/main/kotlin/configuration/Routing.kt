@@ -6,19 +6,11 @@ import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.resources.*
 import ord.pumped.common.APIException
-import ord.pumped.io.websocket.auth.request.validateUpgradeWebsocketRequest
-import ord.pumped.usecase.user.rest.request.validateUpdateProfileRequest
-import ord.pumped.usecase.user.rest.request.validateUserLoginRequest
-import ord.pumped.usecase.user.rest.request.validateUserRegisterRequest
-import ord.pumped.usecase.user.rest.request.validateUserUpdatePasswordRequest
+import ord.pumped.usecase.user.rest.request.validateUserRequest
 
 fun Application.configureRouting() {
     install(RequestValidation) {
-        registerValidator(validateUserRegisterRequest)
-        registerValidator(validateUserLoginRequest)
-        registerValidator(validateUpdateProfileRequest)
-        registerValidator(validateUserUpdatePasswordRequest)
-        registerValidator(validateUpgradeWebsocketRequest)
+        registerValidator(validateUserRequest)
     }
     install(Resources)
 
