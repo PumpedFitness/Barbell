@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
+import ord.pumped.common.APIException
 
 fun Application.configureRouting() {
     install(RequestValidation)
@@ -21,11 +22,8 @@ fun Application.configureRouting() {
         exception<Throwable> { call, cause ->
             call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
         }
-        exception<RequestValidationException> { call, cause ->
-            @Serializable
-            data class ValidationError(val message: String, val errors: List<String>)
-
-            call.respond(status = HttpStatusCode.UnprocessableEntity, ValidationError("Validation failed", cause.reasons))
+        exception<APIException> { call, cause ->
+            cause.handle(call)
         }
     }
 }
