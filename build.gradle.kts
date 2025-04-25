@@ -83,6 +83,8 @@ dependencies {
     implementation("dev.nesk.akkurate:akkurate-core:0.11.0")
     ksp("dev.nesk.akkurate:akkurate-ksp-plugin:0.11.0")
 
+    implementation("at.favre.lib:bcrypt:0.10.2")
+
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
