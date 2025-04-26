@@ -1,8 +1,7 @@
 package ord.pumped.configuration.middlewares
 
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import statix.org.*
+import io.ktor.server.application.*
+import statix.org.Middlewares
 
 fun Application.configureMiddlewares() {
     install(Middlewares) {
