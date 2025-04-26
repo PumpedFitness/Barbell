@@ -8,6 +8,7 @@ import ord.pumped.usecase.user.domain.service.UserServiceAdapter
 import ord.pumped.usecase.user.persistence.dto.UserDTO
 import ord.pumped.usecase.user.persistence.repository.UserRepository
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
+import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserRegisterRequestMapper
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -17,6 +18,7 @@ val userModule = module {
     singleOf(::UserRegisterRequestMapper)
     singleOf(::UserModelMapper)
     singleOf(::UserLoginRequestMapper)
+    singleOf(::UserMeRequestMapper)
     singleOf(::UserServiceAdapter) { bind<IUserService>() }
     singleOf(::UserRepository) { bind<IRepository<User, UserDTO>>() }
 }

@@ -1,10 +1,9 @@
 package ord.pumped.usecase.user.rest.controller
 
 import io.ktor.http.*
-import io.ktor.server.request.receive
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import ord.pumped.io.validation.receiveAPIRequest
 import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 
@@ -20,11 +19,17 @@ fun Route.userRouting() {
         }
 
         post("/login") {
-            UserController.loginUser(
+            val response = UserController.loginUser(
                 call.receive<UserLoginRequest>()
             )
 
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK, response)
+        }
+
+        get("/me") {
+            val userID = call.request.queryParameters["userID"]
+            val repsone = UserController.getMe(userID)
+            call.respond(HttpStatusCode.OK, repsone)
         }
     }
 }

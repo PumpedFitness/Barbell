@@ -8,6 +8,7 @@ import ord.pumped.usecase.user.exceptions.UserNotFoundException
 import ord.pumped.usecase.user.persistence.repository.UserRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.*
 
 class UserServiceAdapter : IUserService, KoinComponent {
 
@@ -28,5 +29,10 @@ class UserServiceAdapter : IUserService, KoinComponent {
             throw InvalidPasswordException()
         }
         return userModelMapper.toDomain(existingUser)
+    }
+
+    override fun getUser(userID: UUID): User {
+        val user = userRepository.findByID(userID) ?: throw UserNotFoundException()
+        return userModelMapper.toDomain(user)
     }
 }
