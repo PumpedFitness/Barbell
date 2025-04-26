@@ -17,10 +17,11 @@ data class UserRegisterRequest(
     val email: String
 
 )
-    val validateUserRequest = Validator<UserRegisterRequest> {
-        username.isNotBlank()
-        password.isNotBlank()
-        email.isNotBlank()
-        email.isMatching(Regex("^[\\w\\-]+@([\\w-]+\\.)+[\\w-]{2,}$"))
-    }
+
+val validateUserRegisterRequest = Validator<UserRegisterRequest> {
+    username.isNotBlank()
+    password.isNotBlank()
+    email.isNotBlank()
+    email.isMatching(Regex("^[\\w\\-]+@([\\w-]+\\.)+[\\w-]{2,}$"))
+}
 
