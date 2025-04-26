@@ -20,6 +20,11 @@ enum class EnvVariables(
     BB_REDIS_HOST(EnvType.STRING),
     BB_REDIS_PORT(EnvType.STRING),
 
+    BB_JWT_SECRET(EnvType.STRING),
+    BB_JWT_AUDIENCE(EnvType.STRING),
+    BB_JWT_REALM(EnvType.STRING),
+    BB_JWT_DOMAIN(EnvType.STRING),
+    BB_JWT_EXPIRY(EnvType.NUMBER),
 }
 
 enum class EnvType {
