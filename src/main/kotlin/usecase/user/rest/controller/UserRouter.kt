@@ -5,6 +5,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ord.pumped.io.validation.receiveAPIRequest
+import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 
 
@@ -16,6 +17,14 @@ fun Route.userRouting() {
             )
 
             call.respond(HttpStatusCode.Created, response)
+        }
+
+        post("/login") {
+            UserController.loginUser(
+                call.receive<UserLoginRequest>()
+            )
+
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

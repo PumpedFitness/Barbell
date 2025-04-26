@@ -16,4 +16,8 @@ class UserRepository : IRepository<User, UserDTO> {
             }
         }
     }
+
+    fun findByEmail(email: String): UserDTO{
+        TODO()
+    }
 }

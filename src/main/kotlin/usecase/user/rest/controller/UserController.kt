@@ -1,7 +1,9 @@
 package ord.pumped.usecase.user.rest.controller
 
 import ord.pumped.usecase.user.domain.service.IUserService
+import ord.pumped.usecase.user.exceptions.InvalidPasswordException
 import ord.pumped.usecase.user.rest.mapper.UserRequestMapper
+import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
 import org.koin.core.component.KoinComponent
@@ -15,6 +17,11 @@ object UserController : KoinComponent {
         val userDomainObject = userRequestMapper.toDomain(receiveAPIRequest)
         val registeredUser = userService.registerUser(userDomainObject)
         return userRequestMapper.toResponse(registeredUser)
+    }
+
+    fun loginUser(request: UserLoginRequest) {
+        val loggedInUser = userService.loginUser(request.email, request.password)
+        return
     }
 
 
