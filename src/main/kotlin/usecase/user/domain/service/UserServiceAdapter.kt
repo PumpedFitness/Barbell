@@ -6,7 +6,6 @@ import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.exceptions.InvalidPasswordException
 import ord.pumped.usecase.user.exceptions.UserNotFoundException
 import ord.pumped.usecase.user.persistence.repository.UserRepository
-import ord.pumped.usecase.user.rest.controller.UserController.userService
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -24,10 +23,10 @@ class UserServiceAdapter : IUserService, KoinComponent {
 
     override fun loginUser(email: String, password: String): User {
         val existingUser = userRepository.findByEmail(email) ?: throw UserNotFoundException()
-        val passordVerificationResult = BCrypt.verifyer().verify(password.toCharArray(), existingUser.password)
-        if (!passordVerificationResult.verified){
+        val passwordVerificationResult = BCrypt.verifyer().verify(password.toCharArray(), existingUser.password)
+        if (!passwordVerificationResult.verified) {
             throw InvalidPasswordException()
         }
-        return userService.loginUser(email, password)
+        return userModelMapper.toDomain(existingUser)
     }
 }
