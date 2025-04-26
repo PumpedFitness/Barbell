@@ -1,6 +1,7 @@
 package ord.pumped.usecase.user.rest.controller
 
 import ord.pumped.usecase.user.domain.service.IUserService
+import ord.pumped.usecase.user.exceptions.UserIDWrongFormatException
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserRegisterRequestMapper
@@ -31,7 +32,12 @@ object UserController : KoinComponent {
     }
 
     fun getMe(userID: String?): UserMeResponse {
-        val userID = UUID.fromString(userID)
+        val userID = try {
+            UUID.fromString(userID)
+        } catch (e: IllegalArgumentException) {
+            throw UserIDWrongFormatException()
+        }
+
         val user = userService.getUser(userID)
         return userMeRequestMapper.toResponse(user)
     }
