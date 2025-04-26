@@ -28,8 +28,8 @@ fun Route.userRouting() {
 
         get("/me") {
             val userID = call.request.queryParameters["userID"]
-            val repsone = UserController.getMe(userID)
-            call.respond(HttpStatusCode.OK, repsone)
+            val response = UserController.getMe(userID)
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 }
