@@ -31,7 +31,7 @@ fun Route.userRouting() {
         get("/me") {
             val userID = call.userID()
             val response = UserController.getMe(userID)
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 }
