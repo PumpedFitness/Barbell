@@ -9,7 +9,5 @@ data class UserMeResponse(
     val username: String,
     val email: String,
     val createdAt: Instant,
-    val updatedAt: Instant,
-    val description: String,
-    val profilePicture: String
+    val updatedAt: Instant
 )
