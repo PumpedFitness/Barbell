@@ -8,8 +8,7 @@ import ord.pumped.configuration.userID
 import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 
-
-fun Route.userRouting() {
+fun Route.userRoutingUnauthed() {
     route("/user") {
         post("/register") {
             val response = UserController.registerUser(
@@ -18,7 +17,6 @@ fun Route.userRouting() {
 
             call.respond(HttpStatusCode.Created, response)
         }
-
         post("/login") {
             val response = UserController.loginUser(
                 call.receive<UserLoginRequest>(),
@@ -27,7 +25,11 @@ fun Route.userRouting() {
 
             call.respond(HttpStatusCode.OK, response)
         }
+    }
+}
 
+fun Route.userRoutingAuthed() {
+    route("/user") {
         get("/me") {
             val userID = call.userID()
             val response = UserController.getMe(userID)

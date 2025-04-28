@@ -1,8 +1,15 @@
 package ord.pumped.routes.api.v1
 
 import io.ktor.server.routing.*
-import ord.pumped.usecase.user.rest.controller.userRouting
+import ord.pumped.usecase.user.rest.controller.userRoutingAuthed
+import ord.pumped.usecase.user.rest.controller.userRoutingUnauthed
 
-fun Route.apiV1Routing() {
-    userRouting()
+fun Route.apiV1RoutingAuthed() {
+    route("/auth") {
+        userRoutingAuthed()
+    }
+}
+
+fun Route.apiV1RoutingUnauthed() {
+    userRoutingUnauthed()
 }
