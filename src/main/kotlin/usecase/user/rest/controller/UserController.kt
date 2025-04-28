@@ -4,7 +4,6 @@ import io.ktor.server.application.Application
 import ord.pumped.common.service.ISecurityService
 import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.exceptions.InvalidJwtException
-import ord.pumped.usecase.user.exceptions.UserIDWrongFormatException
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserRegisterRequestMapper
@@ -41,11 +40,8 @@ object UserController : KoinComponent {
         )
     }
 
-    fun getMe(token: String?): UserMeResponse {
-        if (token!!.isBlank()){
-            throw InvalidJwtException()
-        }
-       // val user = userService.getUser(token)
-        return TODO()
+    fun getMe(userId: UUID): UserMeResponse {
+       val user = userService.getUser(userId)
+        return userMeRequestMapper.toResponse(user)
     }
 }

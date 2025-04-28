@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import ord.pumped.configuration.userID
 import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 
@@ -28,8 +29,8 @@ fun Route.userRouting() {
         }
 
         get("/me") {
-            val userID = call.request.queryParameters["token"]
-            //val response = UserController.getMe(token)
+            val userID = call.userID()
+            val response = UserController.getMe(userID)
             call.respond(HttpStatusCode.OK)
         }
     }
