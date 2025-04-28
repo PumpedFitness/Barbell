@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class UserLoginResponse(
     val email: String,
     val username: String,
-    val token: String? = null,
+    var token: String? = "",
 )

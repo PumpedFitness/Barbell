@@ -1,6 +1,9 @@
 package ord.pumped.usecase.user.rest.controller
 
+import io.ktor.server.application.Application
+import ord.pumped.common.service.ISecurityService
 import ord.pumped.usecase.user.domain.service.IUserService
+import ord.pumped.usecase.user.exceptions.InvalidJwtException
 import ord.pumped.usecase.user.exceptions.UserIDWrongFormatException
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
@@ -18,6 +21,7 @@ object UserController : KoinComponent {
     val userRegisterRequestMapper: UserRegisterRequestMapper by inject()
     val userLoginRequestMapper: UserLoginRequestMapper by inject()
     val userMeRequestMapper: UserMeRequestMapper by inject()
+    val securityService: ISecurityService by inject()
     val userService: IUserService by inject()
 
     fun registerUser(receiveAPIRequest: UserRegisterRequest): UserRegisterResponse {
@@ -26,21 +30,22 @@ object UserController : KoinComponent {
         return userRegisterRequestMapper.toResponse(registeredUser)
     }
 
-    fun loginUser(request: UserLoginRequest): UserLoginResponse {
+    fun loginUser(request: UserLoginRequest, application: Application): UserLoginResponse {
         val loggedInUser = userService.loginUser(request.email, request.password)
-        return userLoginRequestMapper.toResponse(loggedInUser)
+        val jwt = securityService.createJWTToken(application, loggedInUser.id!!)
+
+        return UserLoginResponse(
+            username = loggedInUser.username,
+            email = loggedInUser.email,
+            token = jwt
+        )
     }
 
-    fun getMe(userID: String?): UserMeResponse {
-        val userID = try {
-            UUID.fromString(userID)
-        } catch (e: IllegalArgumentException) {
-            throw UserIDWrongFormatException()
+    fun getMe(token: String?): UserMeResponse {
+        if (token!!.isBlank()){
+            throw InvalidJwtException()
         }
-
-        val user = userService.getUser(userID)
-        return userMeRequestMapper.toResponse(user)
+       // val user = userService.getUser(token)
+        return TODO()
     }
-
-
 }

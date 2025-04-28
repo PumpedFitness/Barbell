@@ -20,16 +20,17 @@ fun Route.userRouting() {
 
         post("/login") {
             val response = UserController.loginUser(
-                call.receive<UserLoginRequest>()
+                call.receive<UserLoginRequest>(),
+                call.application
             )
 
             call.respond(HttpStatusCode.OK, response)
         }
 
         get("/me") {
-            val userID = call.request.queryParameters["userID"]
-            val response = UserController.getMe(userID)
-            call.respond(HttpStatusCode.OK, response)
+            val userID = call.request.queryParameters["token"]
+            //val response = UserController.getMe(token)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }
