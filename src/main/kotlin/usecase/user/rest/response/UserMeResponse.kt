@@ -4,7 +4,8 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserRegisterResponse(
+data class UserMeResponse(
+    val id: String,
     val username: String,
     val email: String,
     val createdAt: Instant,
