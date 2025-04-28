@@ -7,21 +7,16 @@ import dev.nesk.akkurate.constraints.builders.isNotBlank
 import kotlinx.serialization.Serializable
 import ord.pumped.usecase.user.rest.request.validation.accessors.email
 import ord.pumped.usecase.user.rest.request.validation.accessors.password
-import ord.pumped.usecase.user.rest.request.validation.accessors.username
 
-@Validate
 @Serializable
-data class UserRegisterRequest(
-    val username: String,
-    val password: String,
-    val email: String
-
+@Validate
+data class UserLoginRequest(
+    val email: String,
+    val password: String
 )
 
-val validateUserRegisterRequest = Validator<UserRegisterRequest> {
-    username.isNotBlank()
-    password.isNotBlank()
+val validateUserLoginRequest = Validator<UserLoginRequest> {
     email.isNotBlank()
+    password.isNotBlank()
     email.isMatching(Regex("^[\\w\\-]+@([\\w-]+\\.)+[\\w-]{2,}$"))
 }
-

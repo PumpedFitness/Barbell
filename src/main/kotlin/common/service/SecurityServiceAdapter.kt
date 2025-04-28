@@ -19,12 +19,13 @@ class SecurityServiceAdapter: ISecurityService {
         return with(application) {
             val jwtAudience = env[EnvVariables.BB_JWT_AUDIENCE]
             val jwtSecret = env[EnvVariables.BB_JWT_SECRET]
+            val jwtDomain = env[EnvVariables.BB_JWT_DOMAIN]
 
             val expiresAt = Clock.System.now().plus(env[EnvVariables.BB_JWT_EXPIRY].toInt().seconds).toJavaInstant()
 
             JWT
                 .create()
-                .withIssuer("pumped-fitness")
+                .withIssuer(jwtDomain)
                 .withAudience(jwtAudience)
                 .withClaim("user_id", userID.toString())
                 .withExpiresAt(expiresAt)

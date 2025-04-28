@@ -8,6 +8,9 @@ import io.ktor.server.auth.jwt.*
 import ord.pumped.common.exceptions.UnauthorizedException
 import ord.pumped.io.env.EnvVariables
 import ord.pumped.io.env.env
+import ord.pumped.usecase.user.persistence.repository.UserRepository
+import org.koin.ktor.ext.inject
+import java.time.Instant
 import java.util.*
 
 fun Application.configureSecurity() {
@@ -15,6 +18,7 @@ fun Application.configureSecurity() {
     val jwtRealm = env[EnvVariables.BB_JWT_REALM]
     val jwtAudience = env[EnvVariables.BB_JWT_AUDIENCE]
     val jwtSecret = env[EnvVariables.BB_JWT_SECRET]
+    val userRepository by inject<UserRepository>()
 
     authentication {
         jwt("jwt") {
@@ -27,6 +31,16 @@ fun Application.configureSecurity() {
                     .build()
             )
             validate { credential ->
+                val userID = credential.payload.getClaim("user_id").asString() ?: throw UnauthorizedException()
+
+                if (userRepository.findByID(UUID.fromString(userID)) == null) {
+                    throw UnauthorizedException()
+                }
+
+                if (credential.payload.expiresAt.toInstant().isBefore(Instant.now())) {
+                    throw UnauthorizedException()
+                }
+
                 if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
             }
         }

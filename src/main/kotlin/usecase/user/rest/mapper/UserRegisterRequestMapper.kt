@@ -4,9 +4,8 @@ import ord.pumped.common.mapping.IRouteMapper
 import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
-import org.jetbrains.exposed.sql.transactions.transaction
 
-class UserRequestMapper : IRouteMapper<UserRegisterRequest, UserRegisterResponse, User> {
+class UserRegisterRequestMapper : IRouteMapper<UserRegisterRequest, UserRegisterResponse, User> {
     override fun toDomain(userRequest: UserRegisterRequest): User {
         return User(
             id = null,
@@ -16,17 +15,12 @@ class UserRequestMapper : IRouteMapper<UserRegisterRequest, UserRegisterResponse
         )
     }
 
-    override fun toResponse(dto: User): UserRegisterResponse {
-        return transaction {
-            UserRegisterResponse(
-                //DEBUG
-                id = dto.id!!.toString(),
-
-                username = dto.username,
-                email = dto.email,
-                createdAt = dto.createdAt,
-                updatedAt = dto.updatedAt
+    override fun toResponse(domain: User): UserRegisterResponse {
+        return UserRegisterResponse(
+                username = domain.username,
+                email = domain.email,
+                createdAt = domain.createdAt,
+                updatedAt = domain.updatedAt
             )
-        }
     }
 }
