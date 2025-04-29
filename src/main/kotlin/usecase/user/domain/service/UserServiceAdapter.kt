@@ -3,6 +3,7 @@ package ord.pumped.usecase.user.domain.service
 import at.favre.lib.crypto.bcrypt.BCrypt
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
 import ord.pumped.usecase.user.domain.model.User
+import ord.pumped.usecase.user.exceptions.EmailAlreadyUsedException
 import ord.pumped.usecase.user.exceptions.InvalidPasswordException
 import ord.pumped.usecase.user.exceptions.UserNotFoundException
 import ord.pumped.usecase.user.persistence.repository.UserRepository
@@ -18,6 +19,11 @@ class UserServiceAdapter : IUserService, KoinComponent {
     override fun registerUser(receiveAPIRequest: User): User {
         receiveAPIRequest.password = BCrypt.withDefaults()
             .hashToString(12, receiveAPIRequest.password.toCharArray())
+
+        if (userRepository.findByEmail(receiveAPIRequest.email) == null) {
+            throw EmailAlreadyUsedException();
+        }
+
         val savedUser = userRepository.save(receiveAPIRequest)
         return userModelMapper.toDomain(savedUser)
     }
