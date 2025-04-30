@@ -14,7 +14,7 @@ object UsersTable : UUIDTable("barbell_users") {
     val password = varchar("password", 255)
     val email = varchar("email", 32)
     val description = varchar("description", 500)
-    val profilePicture = varchar("profile_image", 255)
+    val profilePicture = varchar("profile_picture", 255)
     val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp)
     val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp)
 }
