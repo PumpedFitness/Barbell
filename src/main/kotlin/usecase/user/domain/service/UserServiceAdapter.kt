@@ -20,7 +20,7 @@ class UserServiceAdapter : IUserService, KoinComponent {
         receiveAPIRequest.password = BCrypt.withDefaults()
             .hashToString(12, receiveAPIRequest.password.toCharArray())
 
-        if (userRepository.findByEmail(receiveAPIRequest.email) == null) {
+        if (userRepository.findByEmail(receiveAPIRequest.email) != null) {
             throw EmailAlreadyUsedException();
         }
 
