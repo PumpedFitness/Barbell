@@ -16,7 +16,6 @@ data class UserRegisterRequest(
     val username: String,
     val password: String,
     val email: String
-
 )
 
 val validateUserRegisterRequest = Validator<UserRegisterRequest> {

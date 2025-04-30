@@ -8,7 +8,15 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class UserModelMapper : IModelMapper<User, UserDTO> {
     override fun toDomain(user: UserDTO): User {
         return transaction {
-            User(user.id.value, user.username, user.password, user.email, user.createdAt)
+            User(
+                user.id.value,
+                user.username,
+                user.password,
+                user.email,
+                description = user.description,
+                profilePicture = user.profilePicture,
+                user.createdAt
+            )
         }
     }
 }

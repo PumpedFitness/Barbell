@@ -15,6 +15,8 @@ class UserRepository : IRepository<User, UserDTO> {
                 this.password = user.password
                 this.email = user.email
                 this.updatedAt = user.updatedAt
+                this.description = user.description!!
+                this.profilePicture = user.profilePicture!!
             }
         }
     }
