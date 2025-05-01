@@ -17,6 +17,8 @@ class UserMeRequestMapper : IRouteMapper<String, UserMeResponse, User> {
             username = domain.username,
             email = domain.email,
             createdAt = domain.createdAt,
+            description = domain.description!!,
+            profilePicture = domain.profilePicture!!,
             updatedAt = domain.updatedAt
         )
     }

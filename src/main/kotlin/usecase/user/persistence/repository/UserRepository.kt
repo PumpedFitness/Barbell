@@ -15,7 +15,28 @@ class UserRepository : IRepository<User, UserDTO> {
                 this.password = user.password
                 this.email = user.email
                 this.updatedAt = user.updatedAt
+                this.description = user.description!!
+                this.profilePicture = user.profilePicture!!
             }
+        }
+    }
+
+    override fun update(user: User): UserDTO {
+        return transaction {
+            UserDTO.findByIdAndUpdate(user.id!!) {
+                it.username = user.username
+                it.password = user.password
+                it.email = user.email
+                it.updatedAt = user.updatedAt
+                it.description = user.description!!
+                it.profilePicture = user.profilePicture!!
+            }!!
+        }
+    }
+
+    override fun delete(id: UUID) {
+        transaction {
+            UserDTO.findById(id)?.delete()
         }
     }
 
