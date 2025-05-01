@@ -41,6 +41,7 @@ class UserServiceAdapter : IUserService, KoinComponent {
         return userModelMapper.toDomain(user)
     }
 
+
     override fun updateUserProfile(
         userID: UUID,
         receive: UserUpdateProfileRequest
@@ -62,6 +63,12 @@ class UserServiceAdapter : IUserService, KoinComponent {
             password = hashPassword(newPassword)
         )
         userRepository.update(existingUser)
+    }
+
+    override fun deleteUser(userID: UUID, password: String) {
+        val existingUser = getUser(userID)
+        validatePassword(existingUser.password, password)
+        userRepository.delete(existingUser.id!!)
     }
 
     private fun validatePassword(userPassword: String, requestPassword: String) {

@@ -34,6 +34,12 @@ class UserRepository : IRepository<User, UserDTO> {
         }
     }
 
+    override fun delete(id: UUID) {
+        transaction {
+            UserDTO.findById(id)?.delete()
+        }
+    }
+
     fun findByEmail(email: String): UserDTO? {
         return transaction {
             UserDTO.find {

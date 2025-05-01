@@ -10,4 +10,5 @@ interface IUserService {
     fun getUser(userID: UUID): User
     fun updateUserProfile(userID: UUID, receive: UserUpdateProfileRequest): User
     fun changePassword(userID: UUID, oldPassword: String, newPassword: String)
+    fun deleteUser(userID: UUID, password: String)
 }

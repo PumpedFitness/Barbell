@@ -5,10 +5,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ord.pumped.configuration.userID
-import ord.pumped.usecase.user.rest.request.UserLoginRequest
-import ord.pumped.usecase.user.rest.request.UserRegisterRequest
-import ord.pumped.usecase.user.rest.request.UserUpdatePasswordRequest
-import ord.pumped.usecase.user.rest.request.UserUpdateProfileRequest
+import ord.pumped.usecase.user.rest.request.*
 
 fun Route.userRoutingUnauthed() {
     route("/user") {
@@ -46,6 +43,11 @@ fun Route.userRoutingAuthed() {
                 call.respond(HttpStatusCode.OK, response)
             }
 
+        }
+
+        delete("/delete") {
+            UserController.deleteUser(call.userID(), call.receive<UserDeleteUserRequest>())
+            call.respond(HttpStatusCode.OK)
         }
 
         route("/update") {

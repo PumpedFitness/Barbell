@@ -6,6 +6,7 @@ import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserRegisterRequestMapper
+import ord.pumped.usecase.user.rest.request.UserDeleteUserRequest
 import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
 import ord.pumped.usecase.user.rest.request.UserUpdatePasswordRequest
@@ -39,6 +40,10 @@ object UserController : KoinComponent {
 
     fun updatePassword(userID: UUID, request: UserUpdatePasswordRequest) {
         userService.changePassword(userID, request.oldPassword, request.newPassword)
+    }
+
+    fun deleteUser(userID: UUID, request: UserDeleteUserRequest) {
+        userService.deleteUser(userID, request.password)
     }
 
     fun getMe(userId: UUID): UserMeResponse {
