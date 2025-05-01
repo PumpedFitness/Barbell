@@ -21,6 +21,19 @@ class UserRepository : IRepository<User, UserDTO> {
         }
     }
 
+    override fun update(user: User): UserDTO {
+        return transaction {
+            UserDTO.findByIdAndUpdate(user.id!!) {
+                it.username = user.username
+                it.password = user.password
+                it.email = user.email
+                it.updatedAt = user.updatedAt
+                it.description = user.description!!
+                it.profilePicture = user.profilePicture!!
+            }!!
+        }
+    }
+
     fun findByEmail(email: String): UserDTO? {
         return transaction {
             UserDTO.find {

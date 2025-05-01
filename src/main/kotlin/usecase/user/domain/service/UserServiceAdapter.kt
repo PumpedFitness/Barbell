@@ -1,12 +1,14 @@
 package ord.pumped.usecase.user.domain.service
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import kotlinx.datetime.Clock
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
 import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.exceptions.EmailAlreadyUsedException
 import ord.pumped.usecase.user.exceptions.InvalidPasswordException
 import ord.pumped.usecase.user.exceptions.UserNotFoundException
 import ord.pumped.usecase.user.persistence.repository.UserRepository
+import ord.pumped.usecase.user.rest.request.UserUpdateProfileRequest
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -21,7 +23,7 @@ class UserServiceAdapter : IUserService, KoinComponent {
             .hashToString(12, receiveAPIRequest.password.toCharArray())
 
         if (userRepository.findByEmail(receiveAPIRequest.email) != null) {
-            throw EmailAlreadyUsedException();
+            throw EmailAlreadyUsedException()
         }
 
         val savedUser = userRepository.save(receiveAPIRequest)
@@ -40,5 +42,19 @@ class UserServiceAdapter : IUserService, KoinComponent {
     override fun getUser(userID: UUID): User {
         val user = userRepository.findByID(userID) ?: throw UserNotFoundException()
         return userModelMapper.toDomain(user)
+    }
+
+    override fun updateUserProfile(
+        userID: UUID,
+        receive: UserUpdateProfileRequest
+    ): User {
+        var user = getUser(userID)
+        user = user.copy(
+            updatedAt = Clock.System.now(),
+            username = user.username,
+            description = receive.description,
+            profilePicture = receive.profilePicture
+        )
+        return userModelMapper.toDomain(userRepository.update(user))
     }
 }

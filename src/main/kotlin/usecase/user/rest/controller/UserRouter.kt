@@ -37,7 +37,6 @@ fun Route.userRoutingAuthed() {
             post("/update") {
                 val userID = call.userID()
                 val response = UserProfileController.postUserProfile(userID, call.receive<UserUpdateProfileRequest>())
-
                 call.respond(HttpStatusCode.OK, response)
             }
 

@@ -19,9 +19,10 @@ data class UserRegisterRequest(
 )
 
 val validateUserRegisterRequest = Validator<UserRegisterRequest> {
+    username.hasLengthBetween(IntRange(3, 32))
     username.isNotBlank()
     password.isNotBlank()
-    password.hasLengthBetween(IntRange(8, 50))
+    password.hasLengthBetween(IntRange(8, 255))
     password.isMatching(Regex("^[a-zA-Z0-9!@#\$%^&*()\\-_=+\\[\\]\\\\{}|;:'.,<>/?]*$"))
     email.isNotBlank()
     email.isMatching(Regex("^[\\w\\-]+@([\\w-]+\\.)+[\\w-]{2,}$"))
