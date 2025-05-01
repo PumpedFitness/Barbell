@@ -13,6 +13,8 @@ object UsersTable : UUIDTable("barbell_users") {
     val username = varchar("username", 32)
     val password = varchar("password", 255)
     val email = varchar("email", 32)
+    val description = varchar("description", 500)
+    val profilePicture = varchar("profile_picture", 255)
     val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp)
     val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp)
 }
@@ -24,6 +26,8 @@ class UserDTO(id: EntityID<UUID>) : UUIDEntity(id) {
     var username by UsersTable.username
     var password by UsersTable.password
     var email by UsersTable.email
+    var description by UsersTable.description
+    var profilePicture by UsersTable.profilePicture
     val createdAt by UsersTable.createdAt
     var updatedAt by UsersTable.updatedAt
 }
