@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import ord.pumped.configuration.userID
 import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
+import ord.pumped.usecase.user.rest.request.UserUpdatePasswordRequest
 import ord.pumped.usecase.user.rest.request.UserUpdateProfileRequest
 
 fun Route.userRoutingUnauthed() {
@@ -31,20 +32,28 @@ fun Route.userRoutingUnauthed() {
 
 fun Route.userRoutingAuthed() {
     route("/user") {
-
         route("/profile") {
-
-            post("/update") {
-                val userID = call.userID()
-                val response = UserProfileController.postUserProfile(userID, call.receive<UserUpdateProfileRequest>())
-                call.respond(HttpStatusCode.OK, response)
+            route("/update") {
+                put {
+                    val response =
+                        UserProfileController.postUserProfile(call.userID(), call.receive<UserUpdateProfileRequest>())
+                    call.respond(HttpStatusCode.OK, response)
+                }
             }
 
             get("/me") {
-                val userID = call.userID()
-                val response = UserController.getMe(userID)
+                val response = UserController.getMe(call.userID())
                 call.respond(HttpStatusCode.OK, response)
             }
+
         }
+
+        route("/update") {
+            put("/password") {
+                UserController.updatePassword(call.userID(), call.receive<UserUpdatePasswordRequest>())
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+
     }
 }

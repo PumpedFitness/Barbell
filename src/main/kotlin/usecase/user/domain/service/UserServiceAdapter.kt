@@ -19,8 +19,7 @@ class UserServiceAdapter : IUserService, KoinComponent {
     val userModelMapper: UserModelMapper by inject()
 
     override fun registerUser(receiveAPIRequest: User): User {
-        receiveAPIRequest.password = BCrypt.withDefaults()
-            .hashToString(12, receiveAPIRequest.password.toCharArray())
+        receiveAPIRequest.password = hashPassword(receiveAPIRequest.password)
 
         if (userRepository.findByEmail(receiveAPIRequest.email) != null) {
             throw EmailAlreadyUsedException()
@@ -32,11 +31,9 @@ class UserServiceAdapter : IUserService, KoinComponent {
 
     override fun loginUser(email: String, password: String): User {
         val existingUser = userRepository.findByEmail(email) ?: throw UserNotFoundException()
-        val passwordVerificationResult = BCrypt.verifyer().verify(password.toCharArray(), existingUser.password)
-        if (!passwordVerificationResult.verified) {
-            throw InvalidPasswordException()
-        }
-        return userModelMapper.toDomain(existingUser)
+        val mappedExistingUser = userModelMapper.toDomain(existingUser)
+        validatePassword(mappedExistingUser.password, password)
+        return mappedExistingUser
     }
 
     override fun getUser(userID: UUID): User {
@@ -48,13 +45,34 @@ class UserServiceAdapter : IUserService, KoinComponent {
         userID: UUID,
         receive: UserUpdateProfileRequest
     ): User {
-        var user = getUser(userID)
-        user = user.copy(
+        var existingUser = getUser(userID)
+        existingUser = existingUser.copy(
             updatedAt = Clock.System.now(),
-            username = user.username,
+            username = existingUser.username,
             description = receive.description,
             profilePicture = receive.profilePicture
         )
-        return userModelMapper.toDomain(userRepository.update(user))
+        return userModelMapper.toDomain(userRepository.update(existingUser))
+    }
+
+    override fun changePassword(userID: UUID, oldPassword: String, newPassword: String) {
+        var existingUser = getUser(userID)
+        validatePassword(existingUser.password, oldPassword)
+        existingUser = existingUser.copy(
+            password = hashPassword(newPassword)
+        )
+        userRepository.update(existingUser)
+    }
+
+    private fun validatePassword(userPassword: String, requestPassword: String) {
+        val passwordVerificationResult = BCrypt.verifyer().verify(requestPassword.toCharArray(), userPassword)
+        if (!passwordVerificationResult.verified) {
+            throw InvalidPasswordException()
+        }
+    }
+
+    private fun hashPassword(password: String): String {
+        return BCrypt.withDefaults()
+            .hashToString(12, password.toCharArray())
     }
 }

@@ -8,6 +8,7 @@ import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserRegisterRequestMapper
 import ord.pumped.usecase.user.rest.request.UserLoginRequest
 import ord.pumped.usecase.user.rest.request.UserRegisterRequest
+import ord.pumped.usecase.user.rest.request.UserUpdatePasswordRequest
 import ord.pumped.usecase.user.rest.response.UserLoginResponse
 import ord.pumped.usecase.user.rest.response.UserMeResponse
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
@@ -34,6 +35,10 @@ object UserController : KoinComponent {
         return userLoginRequestMapper.toResponse(loggedInUser).copy(
             token = jwt
         )
+    }
+
+    fun updatePassword(userID: UUID, request: UserUpdatePasswordRequest) {
+        userService.changePassword(userID, request.oldPassword, request.newPassword)
     }
 
     fun getMe(userId: UUID): UserMeResponse {
