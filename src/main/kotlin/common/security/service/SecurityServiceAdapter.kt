@@ -11,8 +11,8 @@ import ord.pumped.common.security.domain.mapper.TokenModelMapper
 import ord.pumped.common.security.domain.model.Token
 import ord.pumped.common.security.persistance.dto.TokenDTO
 import ord.pumped.common.security.persistance.repository.TokenRepository
-import ord.pumped.configuration.secrets
 import ord.pumped.io.env.EnvVariables
+import ord.pumped.io.env.env
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.module.dsl.bind
@@ -28,11 +28,11 @@ class SecurityServiceAdapter: ISecurityService, KoinComponent {
 
     override fun createJWTToken(application: Application, userID: UUID): Token {
         return with(application) {
-            val jwtAudience = secrets[EnvVariables.BB_JWT_AUDIENCE]
-            val jwtSecret = secrets[EnvVariables.BB_JWT_SECRET]
-            val jwtDomain = secrets[EnvVariables.BB_JWT_DOMAIN]
+            val jwtAudience = env[EnvVariables.BB_JWT_AUDIENCE]
+            val jwtSecret = env[EnvVariables.BB_JWT_SECRET]
+            val jwtDomain = env[EnvVariables.BB_JWT_DOMAIN]
 
-            val expiresAt = Clock.System.now().plus(secrets[EnvVariables.BB_JWT_EXPIRY].toInt().seconds).toJavaInstant()
+            val expiresAt = Clock.System.now().plus(env[EnvVariables.BB_JWT_EXPIRY].toInt().seconds).toJavaInstant()
             val savedToken = tokenRepository.save(Token(UUID.randomUUID(), false))
             val tokenModel = tokenModelMapper.toDomain(savedToken)
 
@@ -59,5 +59,4 @@ val securityModule = module {
     singleOf(::SecurityServiceAdapter) { bind<ISecurityService>() }
     singleOf(::TokenRepository) { bind<IRepository<Token, TokenDTO>>() }
     singleOf(::TokenModelMapper) { bind<IModelMapper<Token, TokenDTO>>() }
-    singleOf(::JWTServiceAdapter) { bind<IJWTService>() }
 }
