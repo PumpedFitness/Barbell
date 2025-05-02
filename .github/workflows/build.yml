@@ -34,10 +34,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
-      - name: Debug loaded environment variables
-        run: |
-          cat ci/env/.env.test
-
       - name: Load environment variables from .env.test
         run: |
           if [ -f ci/env/.env.test ]; then
@@ -66,9 +62,6 @@ jobs:
             echo "BB_JWT_SECRET=${{ secrets.BB_JWT_SECRET }}" >> $GITHUB_ENV
           fi
 
-      - name: Print all environment variables
-        run: printenv | sort
-
       - name: Docker Compose Up
         run: docker-compose up -d
 
@@ -77,5 +70,5 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build --stacktrace
-
-
+        env:
+          DOTENV_CONFIG_PATH: ci/env/env.test
