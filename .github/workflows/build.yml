@@ -12,7 +12,9 @@ on:
         required: false
         default: '21'
         type: string
-
+  push:
+    branches:
+      - 5-ci-cd-pipeline
 jobs:
   build:
     runs-on: ubuntu-latest
