@@ -4,6 +4,8 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import ord.pumped.common.security.service.SecurityController
+import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.usecase.user.rest.request.*
 
@@ -47,6 +49,7 @@ fun Route.userRoutingAuthed() {
 
         delete("/delete") {
             UserController.deleteUser(call.userID(), call.receive<UserDeleteUserRequest>())
+            SecurityController.blacklistToken(call.tokenID())
             call.respond(HttpStatusCode.OK)
         }
 
