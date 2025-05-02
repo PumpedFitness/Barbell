@@ -1,11 +1,9 @@
 package ord.pumped.usecase.user
 
-import ord.pumped.common.IRepository
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
-import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.domain.service.UserServiceAdapter
-import ord.pumped.usecase.user.persistence.dto.UserDTO
+import ord.pumped.usecase.user.persistence.repository.IUserRepository
 import ord.pumped.usecase.user.persistence.repository.UserRepository
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
@@ -20,5 +18,5 @@ val userModule = module {
     singleOf(::UserLoginRequestMapper)
     singleOf(::UserMeRequestMapper)
     singleOf(::UserServiceAdapter) { bind<IUserService>() }
-    singleOf(::UserRepository) { bind<IRepository<User, UserDTO>>() }
+    singleOf(::UserRepository) { bind<IUserRepository>() }
 }

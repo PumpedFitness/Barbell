@@ -7,7 +7,7 @@ import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.exceptions.EmailAlreadyUsedException
 import ord.pumped.usecase.user.exceptions.InvalidPasswordException
 import ord.pumped.usecase.user.exceptions.UserNotFoundException
-import ord.pumped.usecase.user.persistence.repository.UserRepository
+import ord.pumped.usecase.user.persistence.repository.IUserRepository
 import ord.pumped.usecase.user.rest.request.UserUpdateProfileRequest
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -15,7 +15,7 @@ import java.util.*
 
 class UserServiceAdapter : IUserService, KoinComponent {
 
-    val userRepository: UserRepository by inject()
+    val userRepository: IUserRepository by inject()
     val userModelMapper: UserModelMapper by inject()
 
     override fun registerUser(receiveAPIRequest: User): User {
