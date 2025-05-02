@@ -1,7 +1,7 @@
 package ord.pumped.usecase.user.rest.controller
 
 import io.ktor.server.application.*
-import ord.pumped.common.service.ISecurityService
+import ord.pumped.common.security.service.ISecurityService
 import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.rest.mapper.UserLoginRequestMapper
 import ord.pumped.usecase.user.rest.mapper.UserMeRequestMapper
@@ -32,9 +32,9 @@ object UserController : KoinComponent {
 
     fun loginUser(request: UserLoginRequest, application: Application): UserLoginResponse {
         val loggedInUser = userService.loginUser(request.email, request.password)
-        val jwt = securityService.createJWTToken(application, loggedInUser.id!!)
+        val token = securityService.createJWTToken(application, loggedInUser.id!!)
         return userLoginRequestMapper.toResponse(loggedInUser).copy(
-            token = jwt
+            token = token.jwt
         )
     }
 
