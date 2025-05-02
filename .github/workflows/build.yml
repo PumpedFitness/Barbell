@@ -5,7 +5,7 @@ on:
     inputs:
       env-file:
         description: 'The environment file to load (e.g., .env.test, .env.nonlive)'
-        required: true
+        required: false
         type: string
       java-version:
         description: "java version that should be used"
@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ inputs.java-version }}
+          java-version: 21
 
       - name: Set up Docker Compose
         run: |
@@ -36,8 +36,8 @@ jobs:
 
       - name: Load environment file
         run: |
-          if [ -f ${{ inputs.env-file }} ]; then
-            echo "Loading environment variables from ${{ inputs.env-file }}"
+          if [ -f ./ci/env/env.test ]; then
+            echo "Loading environment variables from evb"
             set -a
             source ${{ inputs.env-file }}
             set +a
