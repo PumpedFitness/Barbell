@@ -1,4 +1,4 @@
-name: Base Ktor Build
+name: build service
 
 on:
   workflow_dispatch:
