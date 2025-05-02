@@ -39,10 +39,10 @@ jobs:
           if [ -f ./ci/env/env.test ]; then
             echo "Loading environment variables from evb"
             set -a
-            source ${{ inputs.env-file }}
+            source ./ci/env/env.test
             set +a
           else
-            echo "${{ inputs.env-file }} not found"
+            echo "./ci/env/env.test not found"
             exit 1
           fi
 
