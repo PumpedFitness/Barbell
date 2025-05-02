@@ -34,6 +34,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
+      - name: Debug List files
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -R
+
       - name: Load environment file
         run: |
           if [ -f ci/env/.env.test ]; then
