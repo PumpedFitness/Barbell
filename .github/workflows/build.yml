@@ -34,11 +34,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
-      - name: Debug List files
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -R
-
       - name: Load environment file
         run: |
           if [ -f ci/env/.env.test ]; then
@@ -64,6 +59,9 @@ jobs:
           if [ -z "${BB_JWT_SECRET}" ]; then
             echo "BB_JWT_SECRET=${{ secrets.BB_JWT_SECRET }}" >> $GITHUB_ENV
           fi
+
+      - name: Print all environment variables
+        run: printenv | sort
 
       - name: Docker Compose Up
         run: docker-compose up -d
