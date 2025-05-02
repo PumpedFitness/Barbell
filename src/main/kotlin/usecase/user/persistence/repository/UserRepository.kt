@@ -1,13 +1,12 @@
 package ord.pumped.usecase.user.persistence.repository
 
-import ord.pumped.common.IRepository
 import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.persistence.dto.UserDTO
 import ord.pumped.usecase.user.persistence.dto.UsersTable
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-class UserRepository : IRepository<User, UserDTO> {
+class UserRepository : IUserRepository {
     override fun save(user: User): UserDTO {
         return transaction {
             UserDTO.new {
@@ -40,7 +39,7 @@ class UserRepository : IRepository<User, UserDTO> {
         }
     }
 
-    fun findByEmail(email: String): UserDTO? {
+    override fun findByEmail(email: String): UserDTO? {
         return transaction {
             UserDTO.find {
                 UsersTable.email eq email
@@ -48,7 +47,7 @@ class UserRepository : IRepository<User, UserDTO> {
         }
     }
 
-    fun findByID(userID: UUID): UserDTO? {
+    override fun findByID(userID: UUID): UserDTO? {
         return transaction {
             UserDTO.find {
                 UsersTable.id eq userID
