@@ -34,6 +34,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
+      - name: Debug loaded environment variables
+        run: |
+          cat ci/env/.env.test
+
       - name: Load environment file
         run: |
           if [ -f ci/env/.env.test ]; then
