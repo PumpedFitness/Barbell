@@ -38,13 +38,15 @@ jobs:
         run: |
           cat ci/env/.env.test
 
-      - name: Load environment file
+      - name: Load environment variables from .env.test
         run: |
           if [ -f ci/env/.env.test ]; then
-            echo "Loading environment variables from evb"
-            set -a
-            source ci/env/.env.test
-            set +a
+            echo "Loading environment variables from .env.test"
+            while IFS= read -r line || [[ -n "$line" ]]; do
+              if [[ "$line" == *=* ]]; then
+                echo "$line" >> "$GITHUB_ENV"
+              fi
+            done < ci/env/.env.test
           else
             echo "ci/env/.env.test not found"
             exit 1
