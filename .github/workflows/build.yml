@@ -13,8 +13,6 @@ on:
         default: '21'
         type: string
 
-  pull_request:
-
 jobs:
   build:
     runs-on: ubuntu-latest
