@@ -1,4 +1,4 @@
-name: build service
+name: build and test
 
 on:
   workflow_dispatch:
@@ -65,8 +65,11 @@ jobs:
       - name: Docker Compose Up
         run: docker-compose up -d
 
+      - name: move test env
+        run: mv /ci/env/.env .
+
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
         run: ./gradlew build --stacktrace
