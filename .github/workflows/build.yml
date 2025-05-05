@@ -65,8 +65,8 @@ jobs:
       - name: Docker Compose Up
         run: docker-compose up -d
 
-      - name: move test env
-        run: mv /ci/env/.env .
+      - name: Move and rename .env file
+        run: mv /ci/.env.test .env
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
