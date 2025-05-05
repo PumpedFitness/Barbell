@@ -14,7 +14,8 @@ on:
         type: string
   push:
     branches:
-      - 5-ci-cd-pipeline
+      - development
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -73,5 +74,3 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build --stacktrace
-        env:
-          DOTENV_CONFIG_PATH: ci/env/env.test

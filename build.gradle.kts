@@ -103,9 +103,3 @@ dependencies {
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
-
-sourceSets {
-    test {
-        resources.srcDir("ci/env")
-    }
-}
