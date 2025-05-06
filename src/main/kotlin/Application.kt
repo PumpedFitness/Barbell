@@ -17,6 +17,7 @@ fun Application.module(testing: Boolean = false) {
     configureEnv()
 
     configureDatabases(testing)
+    configureRabbitMQ()
 
     configureKoin()
     configureHTTP()

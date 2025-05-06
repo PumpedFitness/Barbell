@@ -22,11 +22,26 @@ services:
     networks:
       - app-network
 
+  rabbitmq:
+    image: rabbitmq:4.1.0-management
+    restart: always
+    ports:
+      - ${BB_RABBITMQ_PORT}:5672
+      - ${BB_RABBITMQ_HTTP_PORT}:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${BB_RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${BB_RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+    networks:
+      app-network:
+
 volumes:
   mariadb_data:
     driver: local
   redis_data:
     driver: local
+  rabbitmq-lib:
 
 networks:
   app-network:
