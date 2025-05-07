@@ -1,7 +1,10 @@
 package ord.pumped.configuration
 
 import io.ktor.server.application.*
+import io.ktor.server.routing.routing
 import io.ktor.server.websocket.*
+import ord.pumped.io.websocket.IWebsocketHandler
+import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
 
 fun Application.configureWebSocket() {
@@ -10,5 +13,13 @@ fun Application.configureWebSocket() {
         timeout = 15.seconds
         maxFrameSize = Long.MAX_VALUE
         masking = false
+    }
+
+    val websocketHandler by inject<IWebsocketHandler>()
+
+    routing {
+        webSocket("/ws") {
+            websocketHandler.handleNewWebsocket(this, call)
+        }
     }
 }
