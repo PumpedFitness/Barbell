@@ -3,6 +3,7 @@ package ord.pumped.io.secret.adapters
 import io.github.hansanto.kault.VaultClient
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonPrimitive
 import ord.pumped.io.secret.SecretAdapter
 
 class VaultAdapter(): SecretAdapter {
@@ -22,7 +23,7 @@ class VaultAdapter(): SecretAdapter {
     }
 
     override fun get(key: String): String? {
-        return secrets[key].toString()
+        return secrets[key]?.jsonPrimitive?.content
     }
 
     override fun getAllKeys(): Set<String> {
