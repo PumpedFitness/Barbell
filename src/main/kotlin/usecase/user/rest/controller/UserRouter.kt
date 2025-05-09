@@ -4,10 +4,14 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 import ord.pumped.common.security.service.SecurityController
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
+import ord.pumped.io.websocket.routing.messaging.BadRequestNotification
+import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
+import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
 
 fun Route.userRoutingUnauthed() {
@@ -29,7 +33,14 @@ fun Route.userRoutingUnauthed() {
             call.respond(HttpStatusCode.OK, response)
         }
     }
+    routeWebsocket<SampleAction>("/") {
+        BadRequestNotification()
+    }
 }
+
+
+@Serializable
+data class SampleAction(val test: String): IWebsocketAction
 
 fun Route.userRoutingAuthed() {
     route("/user") {
