@@ -67,6 +67,9 @@ dependencies {
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.2")
 
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
+    implementation("io.ktor:ktor-client-cio:${ktor_version}")
+    implementation("io.github.hansanto:kault:1.5.1")
+    // required for kault
 
     implementation("org.flywaydb:flyway-core:$flyway_version")
     implementation("org.flywaydb:flyway-mysql:$flyway_version")
