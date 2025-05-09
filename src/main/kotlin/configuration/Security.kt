@@ -6,6 +6,7 @@ import io.ktor.server.auth.jwt.*
 import ord.pumped.common.exceptions.UnauthorizedException
 import ord.pumped.common.security.domain.mapper.TokenModelMapper
 import ord.pumped.common.security.persistance.repository.TokenRepository
+import ord.pumped.common.security.service.IJWTService
 import ord.pumped.io.env.EnvVariables
 import ord.pumped.usecase.user.persistence.repository.UserRepository
 import org.koin.ktor.ext.inject
