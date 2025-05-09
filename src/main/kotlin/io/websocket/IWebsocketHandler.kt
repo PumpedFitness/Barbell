@@ -6,7 +6,6 @@ import ord.pumped.usecase.user.domain.model.User
 import org.koin.core.component.KoinComponent
 
 interface IWebsocketHandler: KoinComponent {
-
     suspend fun handleNewWebsocket(session: DefaultWebSocketSession, call: ApplicationCall)
 
     fun registerNewWebsocket(user: User, session: DefaultWebSocketSession)

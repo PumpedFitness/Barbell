@@ -1,7 +1,5 @@
 package ord.pumped.configuration
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -15,11 +13,10 @@ import java.time.Instant
 import java.util.*
 
 fun Application.configureSecurity() {
-    val jwtDomain = secrets[EnvVariables.BB_JWT_DOMAIN]
     val jwtRealm = secrets[EnvVariables.BB_JWT_REALM]
     val jwtAudience = secrets[EnvVariables.BB_JWT_AUDIENCE]
-    val jwtSecret = secrets[EnvVariables.BB_JWT_SECRET]
 
+    val jwtService by inject<IJWTService>()
     val userRepository by inject<UserRepository>()
     val tokenRepository by inject<TokenRepository>()
     val tokenModelMapper by inject<TokenModelMapper>()
@@ -28,11 +25,7 @@ fun Application.configureSecurity() {
         jwt("jwt") {
             realm = jwtRealm
             verifier(
-                JWT
-                    .require(Algorithm.HMAC256(jwtSecret))
-                    .withAudience(jwtAudience)
-                    .withIssuer(jwtDomain)
-                    .build()
+                jwtService.verifier(this@configureSecurity)
             )
             validate { credential ->
                 val userID = credential.payload.getClaim("user_id").asString() ?: throw UnauthorizedException()

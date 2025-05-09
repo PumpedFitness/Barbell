@@ -59,4 +59,5 @@ val securityModule = module {
     singleOf(::SecurityServiceAdapter) { bind<ISecurityService>() }
     singleOf(::TokenRepository) { bind<IRepository<Token, TokenDTO>>() }
     singleOf(::TokenModelMapper) { bind<IModelMapper<Token, TokenDTO>>() }
+    singleOf(::JWTServiceAdapter) { bind<IJWTService>() }
 }

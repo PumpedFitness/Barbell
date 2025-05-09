@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import ord.pumped.common.security.service.SecurityController
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
+import ord.pumped.configuration.userTokenCookie
 import ord.pumped.usecase.user.rest.request.*
 
 fun Route.userRoutingUnauthed() {
@@ -24,6 +25,7 @@ fun Route.userRoutingUnauthed() {
                 call.application
             )
 
+            call.response.cookies.append(userTokenCookie(response.token!!))
             call.respond(HttpStatusCode.OK, response)
         }
     }

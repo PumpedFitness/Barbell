@@ -1,8 +1,11 @@
 package ord.pumped.configuration
 
 import io.ktor.server.application.*
+import io.ktor.server.request.header
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.*
+import io.ktor.util.toMap
 import ord.pumped.io.websocket.IWebsocketHandler
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
@@ -18,8 +21,10 @@ fun Application.configureWebSocket() {
     val websocketHandler by inject<IWebsocketHandler>()
 
     routing {
-        webSocket("/ws") {
-            websocketHandler.handleNewWebsocket(this, call)
+        route("/api/v1") {
+            webSocket("/ws") {
+                websocketHandler.handleNewWebsocket(this, call)
+            }
         }
     }
 }
