@@ -1,20 +1,13 @@
 name: build and test
 
 on:
+  pull_request:
+    types:
+      - opened
   workflow_dispatch:
-    inputs:
-      env-file:
-        description: 'The environment file to load (e.g., .env.test, .env.nonlive)'
-        required: false
-        type: string
-      java-version:
-        description: "java version that should be used"
-        required: false
-        default: '21'
-        type: string
   push:
     branches:
-      - development
+      - 5-ci-cd-pipeline
 
 jobs:
   build:
@@ -35,32 +28,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
-      - name: Load environment variables from .env.test
+      - name: Load environment variables from .env.template
         run: |
-          if [ -f ci/env/.env.test ]; then
-            echo "Loading environment variables from .env.test"
+          if [ -f .env.template ]; then
+            echo "Loading environment variables from .env.template"
             while IFS= read -r line || [[ -n "$line" ]]; do
               if [[ "$line" == *=* ]]; then
                 echo "$line" >> "$GITHUB_ENV"
               fi
-            done < ci/env/.env.test
+            done < .env.template
           else
-            echo "ci/env/.env.test not found"
+            echo ".env.template not found"
             exit 1
-          fi
-
-      - name: Conditionally inject secrets
-        run: |
-          if [ -z "${BB_DB_ROOT_PASSWORD}" ]; then
-            echo "BB_DB_ROOT_PASSWORD=${{ secrets.BB_DB_ROOT_PASSWORD }}" >> $GITHUB_ENV
-          fi
-          
-          if [ -z "${BB_DB_PASSWORD}" ]; then
-            echo "BB_DB_PASSWORD=${{ secrets.BB_DB_PASSWORD }}" >> $GITHUB_ENV
-          fi
-          
-          if [ -z "${BB_JWT_SECRET}" ]; then
-            echo "BB_JWT_SECRET=${{ secrets.BB_JWT_SECRET }}" >> $GITHUB_ENV
           fi
 
       - name: Docker Compose Up
