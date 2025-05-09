@@ -13,7 +13,7 @@ interface IWebsocketRouter {
     fun routePath(path: String, eventData: JsonObject): List<IWebsocketNotification>
 }
 
-inline fun <reified T: IWebsocketAction> Route.routeWebsocket(path: String, noinline block: IWebsocketRoute<T>.(action: IWebsocketAction) -> IWebsocketNotification?): IWebsocketRoute<T> {
+inline fun <reified T: IWebsocketAction> Route.routeWebsocket(path: String, noinline block: IWebsocketRoute<T>.(action: T) -> IWebsocketNotification?): IWebsocketRoute<T> {
     val router by application.inject<IWebsocketRouter>()
     val route = DefaultWebsocketRoute(path, T::class, block)
 

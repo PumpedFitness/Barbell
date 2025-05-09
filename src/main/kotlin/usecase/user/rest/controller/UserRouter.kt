@@ -36,11 +36,19 @@ fun Route.userRoutingUnauthed() {
     routeWebsocket<SampleAction>("/") {
         BadRequestNotification()
     }
+
+    routeWebsocket<SampleAction2>("/api/2") {
+        null
+    }
+
 }
 
 
 @Serializable
 data class SampleAction(val test: String): IWebsocketAction
+
+@Serializable
+data class SampleAction2(val test: String, val bitches: List<String>): IWebsocketAction
 
 fun Route.userRoutingAuthed() {
     route("/user") {

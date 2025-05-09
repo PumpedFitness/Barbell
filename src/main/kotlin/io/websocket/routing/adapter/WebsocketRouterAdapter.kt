@@ -14,14 +14,13 @@ import kotlin.reflect.full.createType
 class WebsocketRouterAdapter: IWebsocketRouter {
 
     private val registeredRoutes = mutableSetOf<IWebsocketRoute<out IWebsocketAction>>()
+    private val json = Json { ignoreUnknownKeys = true }
 
     override fun defineRoute(route: IWebsocketRoute<out IWebsocketAction>) {
         registeredRoutes.add(route)
     }
 
     override fun routePath(path: String, eventData: JsonObject): List<IWebsocketNotification> {
-        val json = Json { ignoreUnknownKeys = true }
-
         val notifications = mutableListOf<IWebsocketNotification>()
         registeredRoutes.forEach { route ->
 

@@ -1,5 +1,6 @@
 package ord.pumped.configuration
 
+import com.auth0.jwt.interfaces.Claim
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -58,12 +59,26 @@ fun Application.configureSecurity() {
  * Only use if route is inside API gateway
  */
 fun ApplicationCall.userID(): UUID {
-    val uuidClaim = principal<JWTPrincipal>()?.payload?.getClaim("user_id") ?: throw UnauthorizedException()
+    val uuidClaim = getAuthClaim("user_id") ?: throw UnauthorizedException()
     return UUID.fromString(uuidClaim.asString())
 }
 
+private fun ApplicationCall.principalByCookie(): JWTPrincipal? {
+    val jwtService by inject<IJWTService>()
+    val cookie = request.cookies[BB_COOKIE] ?: return null
+    val payload = jwtService.verifyOrNull(cookie, application) ?: return null
+    return JWTPrincipal(payload)
+}
+
+private fun ApplicationCall.principalByHeader() = principal<JWTPrincipal>()
+
+private fun ApplicationCall.getAuthClaim(claim: String): Claim? {
+    val principal = principalByCookie() ?: principalByHeader() ?: return null
+    return principal.payload.getClaim(claim)
+}
+
 fun ApplicationCall.tokenID(): UUID {
-    val uuidClaim = principal<JWTPrincipal>()?.payload?.getClaim("token_id") ?: throw UnauthorizedException()
+    val uuidClaim = getAuthClaim("token_id") ?: throw UnauthorizedException()
     return UUID.fromString(uuidClaim.asString())
 }
 
