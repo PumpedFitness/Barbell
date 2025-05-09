@@ -32,10 +32,10 @@ enum class EnvVariables(
     BB_RABBITMQ_HOST(EnvType.STRING),
 }
 
-enum class EnvType {
-    STRING,
-    LONG,
-    INT,
-    NUMBER,
-    BOOLEAN,
+enum class EnvType(val cast: (value: String) -> Boolean) {
+    STRING({ true }),
+    LONG({ it.toLongOrNull() != null }),
+    INT({ it.toIntOrNull() != null }),
+    NUMBER({ it.toDoubleOrNull() != null }),
+    BOOLEAN({ it.toBooleanStrictOrNull() != null }),
 }

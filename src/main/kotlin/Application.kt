@@ -13,7 +13,7 @@ fun main() {
 }
 
 fun Application.module(testing: Boolean = false) {
-    configureSecrets(testing)
+    configureSecrets()
 
     configureDatabases(testing)
     configureRabbitMQ()
@@ -27,7 +27,6 @@ fun Application.module(testing: Boolean = false) {
     configureRouting()
     configureRoutes()
     configureMiddlewares()
-    configureWebsocket()
 
     configureOpenAPI()
     configureSwagger()
