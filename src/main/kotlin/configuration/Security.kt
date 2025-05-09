@@ -9,17 +9,16 @@ import ord.pumped.common.exceptions.UnauthorizedException
 import ord.pumped.common.security.domain.mapper.TokenModelMapper
 import ord.pumped.common.security.persistance.repository.TokenRepository
 import ord.pumped.io.env.EnvVariables
-import ord.pumped.io.env.env
 import ord.pumped.usecase.user.persistence.repository.UserRepository
 import org.koin.ktor.ext.inject
 import java.time.Instant
 import java.util.*
 
 fun Application.configureSecurity() {
-    val jwtDomain = env[EnvVariables.BB_JWT_DOMAIN]
-    val jwtRealm = env[EnvVariables.BB_JWT_REALM]
-    val jwtAudience = env[EnvVariables.BB_JWT_AUDIENCE]
-    val jwtSecret = env[EnvVariables.BB_JWT_SECRET]
+    val jwtDomain = secrets[EnvVariables.BB_JWT_DOMAIN]
+    val jwtRealm = secrets[EnvVariables.BB_JWT_REALM]
+    val jwtAudience = secrets[EnvVariables.BB_JWT_AUDIENCE]
+    val jwtSecret = secrets[EnvVariables.BB_JWT_SECRET]
 
     val userRepository by inject<UserRepository>()
     val tokenRepository by inject<TokenRepository>()
