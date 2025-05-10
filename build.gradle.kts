@@ -103,3 +103,12 @@ dependencies {
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
+
+jib {
+    from {
+        image = "eclipse-temurin:21-jdk"
+    }
+    to {
+        image = System.getenv("DOCKER_IMAGE")
+    }
+}

@@ -22,15 +22,18 @@ jobs:
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: push Docker Image
+      - name: Push Docker Image
         run: ./gradlew jib --stacktrace
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:latest
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: root
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_PRIVATE_KEY_SSH }}
+          port: ${{ secrets.SERVER_PORT }}
           script: |
             docker stop ${{ secrets.PROJECT_NAME }} || true
             docker rm ${{ secrets.PROJECT_NAME }} || true
