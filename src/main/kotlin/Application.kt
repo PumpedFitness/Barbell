@@ -13,11 +13,16 @@ fun main() {
 }
 
 fun Application.module(testing: Boolean = false) {
+    println("Starting application")
+    println("configuring Secrets")
     configureSecrets()
 
+    print("connect DB")
     configureDatabases(testing)
+    print("connect RabbitMQ")
     configureRabbitMQ()
 
+    print("configure application")
     configureKoin()
     configureHTTP()
     configureSecurity()

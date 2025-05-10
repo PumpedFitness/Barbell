@@ -7,7 +7,7 @@ on:
       - 5-ci-cd-pipeline
 
 jobs:
-  build:
+  deploy_bb_nonlive:
     runs-on: ubuntu-latest
     steps:
 
