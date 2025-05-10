@@ -1,7 +1,11 @@
 package ord.pumped.io.websocket.routing.messaging
 
-interface IWebsocketNotification: IWebsocketResponse {
-    val priority: NotificationPriority
-    val body: String
-    val title: String
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Polymorphic
+sealed interface IWebsocketNotification {
+    val message: String
+    val status: Boolean
 }

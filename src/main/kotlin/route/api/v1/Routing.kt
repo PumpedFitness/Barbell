@@ -1,4 +1,4 @@
-package ord.pumped.routes.api.v1
+package ord.pumped.route.api.v1
 
 import io.ktor.server.routing.*
 import ord.pumped.usecase.user.rest.controller.userRoutingAuthed

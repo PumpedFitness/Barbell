@@ -7,8 +7,7 @@ import kotlinx.serialization.serializer
 import ord.pumped.io.websocket.routing.IWebsocketRoute
 import ord.pumped.io.websocket.routing.IWebsocketRouter
 import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
-import ord.pumped.io.websocket.routing.messaging.IWebsocketResponse
-import ord.pumped.usecase.user.domain.model.User
+import ord.pumped.io.websocket.routing.messaging.IWebsocketNotification
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
 
@@ -21,15 +20,20 @@ class WebsocketRouterAdapter: IWebsocketRouter {
         registeredRoutes.add(route)
     }
 
-    override fun routePath(path: String, eventData: JsonObject, user: User): IWebsocketResponse? {
-        val route = registeredRoutes.find { it.path == path } ?: return null
+    override fun routePath(path: String, eventData: JsonObject): List<IWebsocketNotification> {
+        val notifications = mutableListOf<IWebsocketNotification>()
+        registeredRoutes.forEach { route ->
 
-        val serializer = serializerByKClass(route.actionType)!!
-        val action = json.decodeFromJsonElement(serializer, eventData)
+            val serializer = serializerByKClass(route.actionType)!!
+            val action = json.decodeFromJsonElement(serializer, eventData)
 
-        route as IWebsocketRoute<IWebsocketAction>
+            route as IWebsocketRoute<IWebsocketAction>
 
-        return route.execute(action, user)
+            if (route.path == path) {
+                route.execute(action)?.let { notifications.add(it) }
+            }
+        }
+        return notifications
     }
 
     fun <T : Any> serializerByKClass(kClass: KClass<T>): DeserializationStrategy<T>? {
