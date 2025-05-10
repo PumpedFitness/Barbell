@@ -4,13 +4,13 @@ import io.ktor.server.application.*
 import ord.pumped.configuration.userID
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
 import ord.pumped.usecase.user.domain.model.User
-import ord.pumped.usecase.user.persistence.repository.UserRepository
+import ord.pumped.usecase.user.persistence.repository.IUserRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class WebSocketAuthenticatorAdapter: IWebSocketAuthenticator, KoinComponent {
+class WebsocketAuthenticatorAdapter: IWebsocketAuthenticator, KoinComponent {
 
-    private val userRepository by inject<UserRepository>()
+    private val userRepository by inject<IUserRepository>()
     private val userMapper by inject<UserModelMapper>()
 
     override fun authenticate(call: ApplicationCall): User? {

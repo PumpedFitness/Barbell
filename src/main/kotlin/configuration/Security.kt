@@ -9,6 +9,7 @@ import ord.pumped.common.security.domain.mapper.TokenModelMapper
 import ord.pumped.common.security.persistance.repository.TokenRepository
 import ord.pumped.common.security.service.IJWTService
 import ord.pumped.io.env.EnvVariables
+import ord.pumped.usecase.user.persistence.repository.IUserRepository
 import ord.pumped.usecase.user.persistence.repository.UserRepository
 import org.koin.ktor.ext.inject
 import java.time.Instant
@@ -19,7 +20,7 @@ fun Application.configureSecurity() {
     val jwtAudience = secrets[EnvVariables.BB_JWT_AUDIENCE]
 
     val jwtService by inject<IJWTService>()
-    val userRepository by inject<UserRepository>()
+    val userRepository by inject<IUserRepository>()
     val tokenRepository by inject<TokenRepository>()
     val tokenModelMapper by inject<TokenModelMapper>()
 

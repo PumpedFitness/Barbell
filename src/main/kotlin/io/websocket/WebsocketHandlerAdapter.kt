@@ -6,7 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import ord.pumped.io.websocket.auth.IWebSocketAuthenticator
+import ord.pumped.io.websocket.auth.IWebsocketAuthenticator
 import ord.pumped.io.websocket.routing.IWebsocketRouter
 import ord.pumped.io.websocket.routing.messaging.BadRequestNotification
 import ord.pumped.io.websocket.routing.messaging.IWebsocketNotification
@@ -17,7 +17,7 @@ import org.koin.core.component.inject
 
 class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
 
-    private val websocketAuthenticator by inject<IWebSocketAuthenticator>()
+    private val websocketAuthenticator by inject<IWebsocketAuthenticator>()
     private val websocketRouter by inject<IWebsocketRouter>()
 
     private val websockets = mutableMapOf<User, DefaultWebSocketSession>()
