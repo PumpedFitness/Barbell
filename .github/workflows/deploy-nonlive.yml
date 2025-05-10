@@ -1,3 +1,4 @@
+name: deploy barbell service nonlive
 on:
   workflow_dispatch:
   push:
