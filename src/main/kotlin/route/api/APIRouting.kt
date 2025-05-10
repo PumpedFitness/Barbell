@@ -2,8 +2,8 @@ package ord.pumped.route.api
 
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
-import ord.pumped.routes.api.v1.apiV1RoutingAuthed
-import ord.pumped.routes.api.v1.apiV1RoutingUnauthed
+import ord.pumped.route.api.v1.apiV1RoutingAuthed
+import ord.pumped.route.api.v1.apiV1RoutingUnauthed
 
 fun Route.apiRouting() {
         route("/api") {
