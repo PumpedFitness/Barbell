@@ -8,7 +8,7 @@ import ord.pumped.io.websocket.IWebsocketHandler
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
 
-fun Application.configureWebSocket() {
+fun Application.configureWebsocket() {
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 15.seconds

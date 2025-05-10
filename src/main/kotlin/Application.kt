@@ -27,7 +27,7 @@ fun Application.module(testing: Boolean = false) {
     configureRouting()
     configureRoutes()
     configureMiddlewares()
-    configureWebSocket()
+    configureWebsocket()
 
     configureOpenAPI()
     configureSwagger()
