@@ -43,7 +43,7 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:latest
             docker run -d \
             --name ${{ secrets.PROJECT_NAME }} \
-            -p 8080:80 \
+            -p 8080:8080 \
             -e BB_SECRET_ADAPTER=${{ secrets.BB_SECRET_ADAPTER }} \
             -e BB_VAULT_HOST=${{ secrets.BB_VAULT_HOST }} \
             -e BB_VAULT_TOKEN=${{ secrets.BB_VAULT_TOKEN }} \
