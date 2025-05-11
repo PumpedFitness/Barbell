@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - development
-      - 5-ci-cd-pipeline
 
 jobs:
   deploy_bb_nonlive:
@@ -51,3 +50,8 @@ jobs:
             --network barbell_bridge \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sleep 10
+
+      - name: Health Check
+        run: |
+          chmod +x ci/health_check.sh
+          ./ci/health_check.sh ${{ secrets.ServiceURL }}
