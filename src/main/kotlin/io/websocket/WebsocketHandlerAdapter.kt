@@ -35,7 +35,11 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
     override suspend fun handleNewWebsocket(session: DefaultWebSocketSession, call: ApplicationCall) {
         val user = websocketAuthenticator.authenticate(call) ?: return session.close(unauthorizedCloseReason)
 
+        val logger = call.application.log
+
         registerNewWebsocket(user, session)
+
+        logger.info("New websocket authenticated for user ${user.username}")
 
         return coroutineScope {
             async {
@@ -66,6 +70,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 } finally {
+                    logger.info("Websocket closed for user ${user.username}")
                     close(user.id!!)
                 }
             }
