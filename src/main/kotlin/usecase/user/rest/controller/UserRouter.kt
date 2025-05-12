@@ -81,5 +81,11 @@ fun Route.userRoutingAuthed() {
             }
         }
 
+        delete("/logout") {
+            UserController.logoutUser(call.tokenID())
+            call.respond(HttpStatusCode.OK)
+        }
+
     }
+
 }
