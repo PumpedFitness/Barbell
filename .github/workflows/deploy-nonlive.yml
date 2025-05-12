@@ -1,0 +1,57 @@
+name: deploy barbell service nonlive
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - development
+
+jobs:
+  deploy_bb_nonlive:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Login to Docker Hub
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Push Docker Image
+        run: ./gradlew jib --stacktrace
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:latest
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY_SSH }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            docker stop ${{ secrets.PROJECT_NAME }} || true
+            docker rm ${{ secrets.PROJECT_NAME }} || true
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:latest || true
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:latest
+            docker run -d \
+            --name ${{ secrets.PROJECT_NAME }} \
+            -p 8080:8080 \
+            -e BB_SECRET_ADAPTER=${{ secrets.BB_SECRET_ADAPTER }} \
+            -e BB_VAULT_HOST=${{ secrets.BB_VAULT_HOST }} \
+            -e BB_VAULT_TOKEN=${{ secrets.BB_VAULT_TOKEN }} \
+            -e BB_VAULT_PATH=${{ secrets.BB_VAULT_PATH }} \
+            --network barbell_bridge \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            sleep 10
+
+      - name: Health Check
+        run: |
+          chmod +x ci/health_check.sh
+          ./ci/health_check.sh ${{ secrets.ServiceURL }}
