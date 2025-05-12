@@ -4,13 +4,11 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
+import ord.pumped.common.request.actions.EmptyAction
 import ord.pumped.common.security.service.SecurityController
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
-import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
-import ord.pumped.io.websocket.routing.messaging.UserProfileNotification
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
 
@@ -33,15 +31,10 @@ fun Route.userRoutingUnauthed() {
             call.respond(HttpStatusCode.OK, response)
         }
     }
-    routeWebsocket<GetMeAction>("/api/v1/me") { _, user ->
-        val response = UserController.getMe(user.id!!)
-        UserProfileNotification(response.email)
+    routeWebsocket<EmptyAction>("/api/v1/list_users") { _, _ ->
+        UserController.getOnlineUsers()
     }
 }
-
-
-@Serializable
-data class GetMeAction(val holder: String = ""): IWebsocketAction
 
 fun Route.userRoutingAuthed() {
     route("/user") {
@@ -58,7 +51,6 @@ fun Route.userRoutingAuthed() {
                 val response = UserController.getMe(call.userID())
                 call.respond(HttpStatusCode.OK, response)
             }
-
         }
 
         delete("/delete") {

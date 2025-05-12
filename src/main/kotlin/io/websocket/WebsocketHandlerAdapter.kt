@@ -12,6 +12,7 @@ import ord.pumped.io.websocket.auth.IWebsocketAuthenticator
 import ord.pumped.io.websocket.routing.IWebsocketRouter
 import ord.pumped.io.websocket.routing.messaging.BadRequestNotification
 import ord.pumped.io.websocket.routing.messaging.IWebsocketNotification
+import ord.pumped.io.websocket.routing.messaging.IWebsocketResponse
 import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.util.toUUIDOrNull
 import org.koin.core.component.KoinComponent
@@ -60,9 +61,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
 
                         val notifications = websocketRouter.routePath(websocketAction.path, data.jsonObject, user)
 
-                        notifications.forEach {
-                            notifySession(session, it, uuid)
-                        }
+                        notifications?.let { notifySession(session, it, uuid) }
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
@@ -85,11 +84,15 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         sendToSession(session, notification)
     }
 
+    override fun getOnlineUsers(): List<User> {
+        return websockets.keys.toList()
+    }
+
     override fun sendNotificationToAllUsers(notification: IWebsocketNotification) {
         websockets.keys.forEach { sendNotificationToUser(it, notification) }
     }
 
-    fun notifySession(session: DefaultWebSocketSession, notification: IWebsocketNotification, id: UUID) {
+    fun notifySession(session: DefaultWebSocketSession, notification: IWebsocketResponse, id: UUID) {
         val encodedNotification = notification.asJson()
 
         val idInjectedJSON = JsonObject(encodedNotification.jsonObject + ("id" to JsonPrimitive(id.toString())))
@@ -97,7 +100,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         sendStringToSessionAsync(session, idInjectedJSON.toString())
     }
 
-    fun sendToSession(session: DefaultWebSocketSession, value: IWebsocketNotification) {
+    fun sendToSession(session: DefaultWebSocketSession, value: IWebsocketResponse) {
         sendStringToSessionAsync(session, value.asJson().toString())
     }
 
