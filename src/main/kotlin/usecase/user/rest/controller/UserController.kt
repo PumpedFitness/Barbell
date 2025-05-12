@@ -38,6 +38,10 @@ object UserController : KoinComponent {
         )
     }
 
+    fun logoutUser(tokenID: UUID) {
+        securityService.blacklistToken(tokenID)
+    }
+
     fun updatePassword(userID: UUID, request: UserUpdatePasswordRequest) {
         userService.changePassword(userID, request.oldPassword, request.newPassword)
     }
