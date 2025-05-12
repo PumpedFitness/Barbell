@@ -5,12 +5,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ord.pumped.common.request.actions.EmptyAction
+import ord.pumped.common.response.EmptyResponse
 import ord.pumped.common.security.service.SecurityController
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
+import ord.pumped.usecase.user.rest.request.actions.NotifyUserAction
 
 fun Route.userRoutingUnauthed() {
     route("/user") {
@@ -33,6 +35,10 @@ fun Route.userRoutingUnauthed() {
     }
     routeWebsocket<EmptyAction>("/api/v1/list_users") { _, _ ->
         UserController.getOnlineUsers()
+    }
+    routeWebsocket<NotifyUserAction>("/api/v1/notify_user") { action, user ->
+        UserController.notifyUser(action.userID, user)
+        EmptyResponse()
     }
 }
 

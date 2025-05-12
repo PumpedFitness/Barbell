@@ -4,6 +4,7 @@ import io.ktor.server.application.*
 import ord.pumped.common.security.service.ISecurityService
 import ord.pumped.io.websocket.IWebsocketHandler
 import ord.pumped.usecase.user.domain.mapper.OnlineUserModelMapper
+import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.rest.mapper.di.UserRequestMappers
 import ord.pumped.usecase.user.rest.request.UserDeleteUserRequest
@@ -14,6 +15,7 @@ import ord.pumped.usecase.user.rest.response.UserListResponse
 import ord.pumped.usecase.user.rest.response.UserLoginResponse
 import ord.pumped.usecase.user.rest.response.UserMeResponse
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
+import ord.pumped.usecase.user.rest.response.notifications.UserNotification
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -59,6 +61,11 @@ object UserController : KoinComponent {
 
     fun getOnlineUsers(): UserListResponse {
         val users = websocketHandler.getOnlineUsers()
-        return mappers.list.toResponse(users.map { onlineUserModelMapper.toDomain(it) })
+        return mappers.list.toResponse(users.map { onlineUserModelMapper.toDomain(userService.getUser(it)) })
+    }
+
+    fun notifyUser(userID: String, notifier: User) {
+        val user = userService.getUserOrNull(UUID.fromString(userID)) ?: return
+        websocketHandler.sendNotificationToUser(user.id!!, UserNotification("You got a new message from ${notifier.username}!", "Hey ho!"))
     }
 }

@@ -25,7 +25,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
     private val websocketAuthenticator by inject<IWebsocketAuthenticator>()
     private val websocketRouter by inject<IWebsocketRouter>()
 
-    private val websockets = mutableMapOf<User, DefaultWebSocketSession>()
+    private val websockets = mutableMapOf<UUID, DefaultWebSocketSession>()
     private val websocketCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
     private val json = Json {
         ignoreUnknownKeys = true
@@ -66,7 +66,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 } finally {
-                    close(user)
+                    close(user.id!!)
                 }
             }
         }
@@ -76,15 +76,19 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         user: User,
         session: DefaultWebSocketSession
     ) {
-        websockets[user] = session
+        if (websockets.keys.any { it == user.id }) {
+            return
+        }
+
+        websockets[user.id!!] = session
     }
 
-    override fun sendNotificationToUser(user: User, notification: IWebsocketNotification) {
-        val session = websockets[user] ?: return
+    override fun sendNotificationToUser(uuid: UUID, notification: IWebsocketNotification) {
+        val session = websockets[uuid] ?: return
         sendToSession(session, notification)
     }
 
-    override fun getOnlineUsers(): List<User> {
+    override fun getOnlineUsers(): List<UUID> {
         return websockets.keys.toList()
     }
 
@@ -110,11 +114,11 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         }
     }
 
-    override fun close(user: User) {
+    override fun close(uuid: UUID) {
         runBlocking {
-            websockets[user]?.close(defaultCloseReason)
+            websockets[uuid]?.close(defaultCloseReason)
         }
-        websockets.remove(user)
+        websockets.remove(uuid)
     }
 
     private fun decodeActionFromString(content: String): DefaultWebsocketAction? {
