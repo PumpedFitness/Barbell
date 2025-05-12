@@ -5,9 +5,9 @@ import kotlinx.serialization.json.JsonElement
 import ord.pumped.io.defaultJson
 
 @Serializable
-data class BadRequestNotification(
-    override val message: String = "Bad Request",
-    override val status: Boolean = false
+data class UserProfileNotification(val email: String,
+                                   override val message: String = "profile",
+                                   override val status: Boolean = true
 ): IWebsocketNotification {
 
     override fun asJson(): JsonElement {

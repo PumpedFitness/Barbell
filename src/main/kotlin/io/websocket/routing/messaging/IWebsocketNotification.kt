@@ -1,11 +1,10 @@
 package ord.pumped.io.websocket.routing.messaging
 
-import kotlinx.serialization.Polymorphic
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
-@Serializable
-@Polymorphic
-sealed interface IWebsocketNotification {
+interface IWebsocketNotification {
     val message: String
     val status: Boolean
+
+    fun asJson(): JsonElement
 }

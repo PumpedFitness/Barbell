@@ -8,6 +8,7 @@ import ord.pumped.io.websocket.routing.IWebsocketRoute
 import ord.pumped.io.websocket.routing.IWebsocketRouter
 import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
 import ord.pumped.io.websocket.routing.messaging.IWebsocketNotification
+import ord.pumped.usecase.user.domain.model.User
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
 
@@ -20,7 +21,7 @@ class WebsocketRouterAdapter: IWebsocketRouter {
         registeredRoutes.add(route)
     }
 
-    override fun routePath(path: String, eventData: JsonObject): List<IWebsocketNotification> {
+    override fun routePath(path: String, eventData: JsonObject, user: User): List<IWebsocketNotification> {
         val notifications = mutableListOf<IWebsocketNotification>()
         registeredRoutes.forEach { route ->
 
@@ -30,7 +31,7 @@ class WebsocketRouterAdapter: IWebsocketRouter {
             route as IWebsocketRoute<IWebsocketAction>
 
             if (route.path == path) {
-                route.execute(action)?.let { notifications.add(it) }
+                route.execute(action, user)?.let { notifications.add(it) }
             }
         }
         return notifications

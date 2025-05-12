@@ -13,5 +13,7 @@ interface IWebsocketHandler: KoinComponent {
 
     fun sendNotificationToUser(user: User, notification: IWebsocketNotification)
 
+    fun sendNotificationToAllUsers(notification: IWebsocketNotification)
+
     fun close(user: User)
 }

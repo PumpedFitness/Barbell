@@ -9,8 +9,8 @@ import ord.pumped.common.security.service.SecurityController
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
-import ord.pumped.io.websocket.routing.messaging.BadRequestNotification
 import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
+import ord.pumped.io.websocket.routing.messaging.UserProfileNotification
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
 
@@ -33,22 +33,15 @@ fun Route.userRoutingUnauthed() {
             call.respond(HttpStatusCode.OK, response)
         }
     }
-    routeWebsocket<SampleAction>("/") {
-        BadRequestNotification()
+    routeWebsocket<GetMeAction>("/api/v1/me") { _, user ->
+        val response = UserController.getMe(user.id!!)
+        UserProfileNotification(response.email)
     }
-
-    routeWebsocket<SampleAction2>("/api/2") {
-        null
-    }
-
 }
 
 
 @Serializable
-data class SampleAction(val test: String): IWebsocketAction
-
-@Serializable
-data class SampleAction2(val test: String, val bitches: List<String>): IWebsocketAction
+data class GetMeAction(val holder: String = ""): IWebsocketAction
 
 fun Route.userRoutingAuthed() {
     route("/user") {
