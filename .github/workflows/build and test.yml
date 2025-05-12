@@ -1,0 +1,52 @@
+name: build and test
+
+on:
+  pull_request:
+    types:
+      - opened
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+
+      - name: Load environment variables from .env.template
+        run: |
+          if [ -f .env.template ]; then
+            echo "Loading environment variables from .env.template"
+            while IFS= read -r line || [[ -n "$line" ]]; do
+              if [[ "$line" == *=* ]]; then
+                echo "$line" >> "$GITHUB_ENV"
+              fi
+            done < .env.template
+          else
+            echo ".env.template not found"
+            exit 1
+          fi
+
+      - name: Docker Compose Up
+        run: docker-compose up -d
+
+      - name: Move and rename .env file
+        run: mv .env.template .env
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle
+        run: ./gradlew build --stacktrace
