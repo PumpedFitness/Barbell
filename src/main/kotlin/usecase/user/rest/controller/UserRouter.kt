@@ -4,15 +4,15 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
+import ord.pumped.common.request.actions.EmptyAction
+import ord.pumped.common.response.EmptyResponse
 import ord.pumped.common.security.service.SecurityController
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
-import ord.pumped.io.websocket.routing.messaging.BadRequestNotification
-import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
+import ord.pumped.usecase.user.rest.request.actions.NotifyUserAction
 
 fun Route.userRoutingUnauthed() {
     route("/user") {
@@ -33,22 +33,14 @@ fun Route.userRoutingUnauthed() {
             call.respond(HttpStatusCode.OK, response)
         }
     }
-    routeWebsocket<SampleAction>("/") {
-        BadRequestNotification()
+    routeWebsocket<EmptyAction>("/api/v1/list_users") { _, _ ->
+        UserController.getOnlineUsers()
     }
-
-    routeWebsocket<SampleAction2>("/api/2") {
-        null
+    routeWebsocket<NotifyUserAction>("/api/v1/notify_user") { action, user ->
+        UserController.notifyUser(action.userID, user)
+        EmptyResponse()
     }
-
 }
-
-
-@Serializable
-data class SampleAction(val test: String): IWebsocketAction
-
-@Serializable
-data class SampleAction2(val test: String, val bitches: List<String>): IWebsocketAction
 
 fun Route.userRoutingAuthed() {
     route("/user") {
@@ -65,7 +57,6 @@ fun Route.userRoutingAuthed() {
                 val response = UserController.getMe(call.userID())
                 call.respond(HttpStatusCode.OK, response)
             }
-
         }
 
         delete("/delete") {
