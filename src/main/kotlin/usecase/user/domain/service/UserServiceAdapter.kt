@@ -37,7 +37,11 @@ class UserServiceAdapter : IUserService, KoinComponent {
     }
 
     override fun getUser(userID: UUID): User {
-        val user = userRepository.findByID(userID) ?: throw UserNotFoundException()
+        return getUserOrNull(userID) ?: throw UserNotFoundException()
+    }
+
+    override fun getUserOrNull(userID: UUID): User? {
+        val user = userRepository.findByID(userID) ?: return null
         return userModelMapper.toDomain(user)
     }
 

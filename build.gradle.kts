@@ -1,4 +1,5 @@
 import java.net.URI
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposed_version: String by project
 val h2_version: String by project
@@ -105,6 +106,10 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
 
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-XXLanguage:+BreakContinueInInlineLambdas"))
+}
 jib {
     from {
         image = "eclipse-temurin:21-jdk"
