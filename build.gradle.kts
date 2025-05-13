@@ -7,6 +7,8 @@ val kotlin_version: String by project
 val logback_version: String by project
 val ktor_version: String by project
 val flyway_version: String by project
+val koin_version: String by project
+val akkurate_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.20"
@@ -85,17 +87,15 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
 
-    implementation("io.insert-koin:koin-ktor:4.0.0")
-    implementation("io.insert-koin:koin-logger-slf4j:4.0.4")
+    implementation("io.insert-koin:koin-ktor:$koin_version")
+    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
 
-    implementation("dev.nesk.akkurate:akkurate-ktor-server:0.11.0")
-    implementation("dev.nesk.akkurate:akkurate-core:0.11.0")
+    implementation("dev.nesk.akkurate:akkurate-ktor-server:$akkurate_version")
+    implementation("dev.nesk.akkurate:akkurate-core:$akkurate_version")
     implementation("io.ktor:ktor-server-metrics:3.1.3")
     implementation("dev.hayden:khealth:3.0.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.2.1")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.2.1")
-    implementation("io.github.flaxoos:ktor-server-task-scheduling-mongodb:2.1.2")
-    implementation("io.github.flaxoos:ktor-server-task-scheduling-jdbc:2.1.2")
     implementation("io.github.damirdenis-tudor:ktor-server-rabbitmq:1.3.3")
     ksp("dev.nesk.akkurate:akkurate-ksp-plugin:0.11.0")
 
