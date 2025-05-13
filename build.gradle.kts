@@ -86,7 +86,7 @@ dependencies {
     implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
 
     implementation("io.insert-koin:koin-ktor:4.0.0")
-    implementation("io.insert-koin:koin-logger-slf4j:4.0.0")
+    implementation("io.insert-koin:koin-logger-slf4j:4.0.4")
 
     implementation("dev.nesk.akkurate:akkurate-ktor-server:0.11.0")
     implementation("dev.nesk.akkurate:akkurate-core:0.11.0")
