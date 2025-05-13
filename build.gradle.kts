@@ -90,7 +90,7 @@ dependencies {
 
     implementation("dev.nesk.akkurate:akkurate-ktor-server:0.11.0")
     implementation("dev.nesk.akkurate:akkurate-core:0.11.0")
-    implementation("io.ktor:ktor-server-metrics:3.1.2")
+    implementation("io.ktor:ktor-server-metrics:3.1.3")
     implementation("dev.hayden:khealth:3.0.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.1.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.1.2")
