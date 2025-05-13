@@ -13,7 +13,7 @@ fun main() {
 }
 
 fun Application.module(testing: Boolean = false) {
-    configureSecrets()
+    configureSecrets(testing)
 
     configureDatabases(testing)
     configureRabbitMQ()
