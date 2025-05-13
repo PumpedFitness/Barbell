@@ -65,7 +65,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposed_version")
-    implementation("com.zaxxer:HikariCP:6.2.1")
+    implementation("com.zaxxer:HikariCP:6.3.0")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.5.2")
 
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
