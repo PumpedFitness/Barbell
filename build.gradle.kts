@@ -93,7 +93,7 @@ dependencies {
     implementation("io.ktor:ktor-server-metrics:3.1.3")
     implementation("dev.hayden:khealth:3.0.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.2.1")
-    implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.1.2")
+    implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.2.1")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-mongodb:2.1.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-jdbc:2.1.2")
     implementation("io.github.damirdenis-tudor:ktor-server-rabbitmq:1.3.3")
