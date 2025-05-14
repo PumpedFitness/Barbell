@@ -11,6 +11,7 @@ import ord.pumped.usecase.user.exceptions.InvalidPasswordException
 import ord.pumped.usecase.user.exceptions.UserNotFoundException
 import ord.pumped.usecase.user.persistence.dto.UserDTO
 import ord.pumped.usecase.user.persistence.repository.IUserRepository
+import ord.pumped.usecase.user.rest.request.UserUpdateProfileRequest
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -20,6 +21,7 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import usecase.user.testfixtures.UserMother.Companion.createValidUser
+import java.util.*
 import kotlin.test.junit.JUnitAsserter.assertNotEquals
 
 
@@ -177,5 +179,54 @@ class UserServiceTest : KoinTest {
 
     }
 
+    @Nested
+    inner class UpdateTests {
+
+        @Test
+        fun `should update user profile successfully`() {
+            // Arrange
+            val existingUser = createValidUser()
+
+            val updateRequest = UserUpdateProfileRequest(
+                username = existingUser.username,
+                description = "New description",
+                profilePicture = "new.png"
+            )
+
+            val updatedUser = existingUser.copy(
+                description = updateRequest.description,
+                profilePicture = updateRequest.profilePicture
+            )
+
+            every { userRepository.findByID(existingUser.id!!) } returns mockk(relaxed = true) // Needed by getUser()
+            every { userModelMapper.toDomain(any()) } returns updatedUser
+            every { userRepository.update(any()) } returns mockk() // can mock the dto here
+
+            // Act
+            val result = userService.updateUserProfile(existingUser.id!!, updateRequest)
+
+            // Assert
+            assertEquals(updateRequest.description, result.description)
+            assertEquals(updateRequest.profilePicture, result.profilePicture)
+            verify { userRepository.update(any()) }
+        }
+
+        @Test
+        fun `should throw UserNotFoundException when user is not found`() {
+            // Given
+            val userId = UUID.randomUUID()
+            val updateRequest = UserUpdateProfileRequest(
+                username = "john barbell",
+                description = "New desc",
+                profilePicture = "new.png"
+            )
+            every { userRepository.findByID(userId) } returns null
+
+            // Then
+            assertThrows<UserNotFoundException> {
+                userService.updateUserProfile(userId, updateRequest)
+            }
+        }
+    }
 
 }
