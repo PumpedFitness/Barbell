@@ -1,5 +1,5 @@
-import java.net.URI
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URI
 
 val exposed_version: String by project
 val h2_version: String by project
@@ -11,11 +11,11 @@ val koin_version: String by project
 val akkurate_version: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.1.21"
     id("io.ktor.plugin") version "3.1.2"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
-    id("org.flywaydb.flyway") version "10.11.0"
-    id("com.google.devtools.ksp") version "2.1.20-1.0.32"
+    id("org.flywaydb.flyway") version "11.8.2"
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
 }
 
 repositories {
@@ -68,7 +68,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposed_version")
     implementation("com.zaxxer:HikariCP:6.3.0")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.2")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.3")
 
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-client-cio:${ktor_version}")
@@ -80,7 +80,7 @@ dependencies {
 
     implementation("com.ucasoft.ktor:ktor-simple-cache:0.53.4")
     implementation("com.ucasoft.ktor:ktor-simple-redis-cache:0.53.4")
-    implementation("io.github.flaxoos:ktor-server-rate-limiting:2.1.2")
+    implementation("io.github.flaxoos:ktor-server-rate-limiting:2.2.1")
     implementation("io.github.smiley4:ktor-openapi:5.0.2")
     implementation("io.github.smiley4:ktor-swagger-ui:5.0.2")
 
