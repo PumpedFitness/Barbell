@@ -1,5 +1,5 @@
-import java.net.URI
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URI
 
 val exposed_version: String by project
 val h2_version: String by project
@@ -9,6 +9,7 @@ val ktor_version: String by project
 val flyway_version: String by project
 val koin_version: String by project
 val akkurate_version: String by project
+val jupiter_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.20"
@@ -104,6 +105,17 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("io.mockk:mockk:1.14.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiter_version")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiter_version")
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+}
+
+tasks.test {
+    testLogging {
+        showStandardStreams = true
+    }
+    useJUnitPlatform()
 }
 
 val compileKotlin: KotlinCompile by tasks
