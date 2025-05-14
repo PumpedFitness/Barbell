@@ -1,33 +1,46 @@
 package usecase.user.domain.service
 
-import io.mockk.clearMocks
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
+import ord.pumped.usecase.user.domain.mapper.UserModelMapper
+import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.domain.service.IUserService
+import ord.pumped.usecase.user.domain.service.UserServiceAdapter
 import ord.pumped.usecase.user.exceptions.EmailAlreadyUsedException
 import ord.pumped.usecase.user.persistence.dto.UserDTO
 import ord.pumped.usecase.user.persistence.repository.IUserRepository
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.GlobalContext.stopKoin
+import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.inject
-import usecase.user.serviceModule
-import usecase.user.testfixtures.UserMother
+import org.koin.test.get
+import usecase.user.testfixtures.UserMother.Companion.createValidUser
+import kotlin.test.junit.JUnitAsserter.assertNotEquals
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserServiceTest : KoinTest {
 
-    val userService: IUserService by inject()
-    private val userRepository = mockk<IUserRepository>()
+    private lateinit var userService: IUserService
+    private val userRepository = mockk<IUserRepository>(relaxed = true)
+    private val userModelMapper = mockk<UserModelMapper>(relaxed = true)
 
     @BeforeEach
     fun setup() {
-        clearMocks(userRepository)
+        clearMocks(userRepository, userModelMapper)
+
         startKoin {
-            modules(serviceModule)
+            modules(module {
+                single<IUserRepository> { userRepository }
+                single<UserModelMapper> { userModelMapper }
+                single<IUserService> { UserServiceAdapter() }
+            })
         }
+        userService = get()
     }
+
 
     @AfterEach
     fun tearDown() {
@@ -36,16 +49,75 @@ class UserServiceTest : KoinTest {
 
     @Test
     fun `should throw EmailAlreadyUsedException if email is found`() {
-        //given
-        val user = UserMother.createValidUser()
+        // Arrange
+        val user = createValidUser()
         val mockUserDto = mockk<UserDTO>()
 
-        //when
         every { userRepository.findByEmail(any()) } returns mockUserDto
 
-        //then
+        // Act/Assert
         assertThrows<EmailAlreadyUsedException> {
             userService.registerUser(user)
         }
     }
+
+    @Test
+    fun `should verify happy path`() {
+        // Arrange
+        val user = createValidUser()
+        val userDto = mockk<UserDTO>()
+
+        every { userRepository.findByEmail(any()) } returns null
+        every { userRepository.save(user) } returns userDto
+        every { userModelMapper.toDomain(any()) } returns user
+
+        //Act
+        userService.registerUser(user)
+
+        // Assert
+        verify(exactly = 1) { userRepository.save(user) }
+        verify(exactly = 1) { userModelMapper.toDomain(userDto) }
+        verify(exactly = 1) { userRepository.save(user) }
+    }
+
+    @Test
+    fun `should hash the password before saving the user`() {
+        // Arrange
+        val plainPassword = "mySecret123"
+        val user = createValidUser().copy(password = plainPassword)
+
+        val capturedUserSlot = slot<User>()
+        every { userRepository.findByEmail(user.email) } returns null
+        every { userRepository.save(capture(capturedUserSlot)) } answers { mockk<UserDTO>() }
+        every { userModelMapper.toDomain(any()) } returns user
+
+        // Act
+        userService.registerUser(user)
+
+        // Assert
+        val savedUser = capturedUserSlot.captured
+        assertNotEquals("Password should be hashed", savedUser.password, plainPassword)
+        assertTrue(savedUser.password.startsWith("\$2a\$"))
+    }
+
+    @Test
+    fun `should map saved UserDTO to domain User`() {
+        // Arrange
+        val user = createValidUser()
+        val mockDto = mockk<UserDTO>()
+        val mappedUser = mockk<User>()
+
+        every { userRepository.findByEmail(user.email) } returns null
+        every { userRepository.save(any()) } returns mockDto
+        every { userModelMapper.toDomain(mockDto) } returns mappedUser
+
+        // Act
+        val result = userService.registerUser(user)
+
+        // Assert
+        assertEquals(mappedUser, result)
+        verify(exactly = 1) { userModelMapper.toDomain(mockDto) }
+    }
+
+
 }

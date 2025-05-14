@@ -107,21 +107,25 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.mockk:mockk:1.14.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiter_version")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiter_version")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiter_version")
     testImplementation("io.insert-koin:koin-test:$koin_version")
+
+    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2") // ist dependent auf die jupiter version hat aber ein anderen Release
 }
 
-tasks.test {
+tasks.withType<Test> {
+    useJUnitPlatform()
     testLogging {
         showStandardStreams = true
+
     }
-    useJUnitPlatform()
 }
 
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-XXLanguage:+BreakContinueInInlineLambdas"))
 }
+
 jib {
     from {
         image = "eclipse-temurin:21-jdk"
