@@ -17,7 +17,7 @@ data class User(
     companion object
 }
 
-fun User.Companion.testData(): User {
+fun User.Companion.validTestData(): User {
     return User(
         id = UUID.fromString("8688cded-3a55-4a09-9235-6c703388c0e9"),
         username = "username",

@@ -45,7 +45,6 @@ class UserServiceAdapter : IUserService, KoinComponent {
         return userModelMapper.toDomain(user)
     }
 
-
     override fun updateUserProfile(
         userID: UUID,
         receive: UserUpdateProfileRequest

@@ -4,7 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import io.mockk.*
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
 import ord.pumped.usecase.user.domain.model.User
-import ord.pumped.usecase.user.domain.model.testData
+import ord.pumped.usecase.user.domain.model.validTestData
 import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.domain.service.UserServiceAdapter
 import ord.pumped.usecase.user.exceptions.EmailAlreadyUsedException
@@ -55,7 +55,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should throw EmailAlreadyUsedException if email is found`() {
             // Arrange
-            val user = User.testData()
+            val user = User.validTestData()
             val mockUserDto = mockk<UserDTO>()
 
             every { userRepository.findByEmail(any()) } returns mockUserDto
@@ -69,7 +69,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should verify happy path`() {
             // Arrange
-            val user = User.testData()
+            val user = User.validTestData()
 
             val userDto = mockk<UserDTO>()
 
@@ -90,7 +90,7 @@ class UserServiceTest : KoinTest {
         fun `should hash the password before saving the user`() {
             // Arrange
             val plainPassword = "mySecret123"
-            val user = User.testData().copy(password = plainPassword)
+            val user = User.validTestData().copy(password = plainPassword)
 
             val capturedUserSlot = slot<User>()
             every { userRepository.findByEmail(user.email) } returns null
@@ -103,13 +103,13 @@ class UserServiceTest : KoinTest {
             // Assert
             val savedUser = capturedUserSlot.captured
             assertNotEquals("Password should be hashed", savedUser.password, plainPassword)
-            assertTrue(savedUser.password.startsWith("\$2a\$"))
+            assertTrue(savedUser.password.startsWith("$2a$"))
         }
 
         @Test
         fun `should map saved UserDTO to domain User`() {
             // Arrange
-            val user = User.testData()
+            val user = User.validTestData()
 
             val mockDto = mockk<UserDTO>()
             val mappedUser = mockk<User>()
@@ -133,7 +133,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should return user when credentials are correct`() {
             // Arrange
-            val user = User.testData()
+            val user = User.validTestData()
 
             val rawPassword = "securePassword123"
             val hashedPassword = BCrypt.withDefaults().hashToString(12, rawPassword.toCharArray())
@@ -152,7 +152,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should throw UserNotFoundException if email is not found`() {
             // Arrange
-            val user = User.testData()
+            val user = User.validTestData()
 
             every { userRepository.findByEmail(any()) } returns null
 
@@ -165,7 +165,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should throw InvalidPasswordException when password is incorrect`() {
             // Arrange
-            val user = User.testData()
+            val user = User.validTestData()
 
             val wrongPassword = "wrongPassword"
             val hashedPassword = BCrypt.withDefaults().hashToString(12, user.password.toCharArray())
@@ -188,7 +188,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should update user profile successfully`() {
             // Arrange
-            val existingUser = User.testData()
+            val existingUser = User.validTestData()
 
 
             val updateRequest = UserUpdateProfileRequest(
@@ -233,6 +233,120 @@ class UserServiceTest : KoinTest {
         }
     }
 
+    @Nested
+    inner class DeleteTests {
+
+        @Test
+        fun `should delete user when password matches`() {
+            // Arrange
+            val plainPassword = "validPass123"
+            val hashedPassword = BCrypt.withDefaults().hashToString(12, plainPassword.toCharArray())
+            val mockUser = User.validTestData().copy(password = hashedPassword)
+            every { userRepository.findByID(mockUser.id!!) } returns mockk()
+            every { userModelMapper.toDomain(any()) } returns mockUser
+            every { userRepository.delete(mockUser.id!!) } just Runs
+
+            //Act
+            userService.deleteUser(mockUser.id!!, plainPassword)
+
+            // Assert
+            verify(exactly = 1) { userRepository.delete(mockUser.id) }
+        }
+
+        @Test
+        fun `should throw UserNotFoundException when user does not exist`() {
+            // Arrange
+            val fakeUserId = UUID.randomUUID()
+            every { userRepository.findByID(fakeUserId) } returns null
+
+            // Act
+            assertThrows<UserNotFoundException> {
+                userService.deleteUser(fakeUserId, "anyPassword")
+            }
+
+            // Assert
+            verify(exactly = 0) { userRepository.delete(any()) }
+        }
+
+        @Test
+        fun `should throw InvalidPasswordException when password is incorrect`() {
+            // Arrange
+            val plainPassword = "correctPassword"
+            val wrongPassword = "wrongPassword"
+            val hashedPassword = BCrypt.withDefaults().hashToString(12, plainPassword.toCharArray())
+            val mockUser = User.validTestData().copy(password = hashedPassword)
+            every { userRepository.findByID(mockUser.id!!) } returns mockk()
+            every { userModelMapper.toDomain(any()) } returns mockUser
+
+            // Act
+            assertThrows<InvalidPasswordException> {
+                userService.deleteUser(mockUser.id!!, wrongPassword)
+            }
+
+            // Assert
+            verify(exactly = 0) { userRepository.delete(any()) }
+        }
+    }
+
+    @Nested
+    inner class ChangePasswordTests {
+
+        @Test
+        fun `should change password when old password is correct`() {
+            // Arrange
+            val oldPassword = "oldPass123"
+            val newPassword = "newPass456"
+            val hashedOldPassword = BCrypt.withDefaults().hashToString(12, oldPassword.toCharArray())
+            val user = User.validTestData().copy(password = hashedOldPassword)
+            val updatedUserSlot = slot<User>()
+            every { userRepository.findByID(user.id!!) } returns mockk()
+            every { userModelMapper.toDomain(any()) } returns user
+            every { userRepository.update(capture(updatedUserSlot)) } returns mockk()
+
+            // Act
+            userService.changePassword(user.id!!, oldPassword, newPassword)
+
+            // Assert
+            val updatedUser = updatedUserSlot.captured
+            verify(exactly = 1) { userRepository.update(capture(updatedUserSlot)) }
+            assertTrue(updatedUser.password != hashedOldPassword, "Password should be changed and rehashed")
+            assertTrue(updatedUser.password.startsWith("$2a$"), "Password should be BCrypt hashed")
+        }
+
+        @Test
+        fun `should throw UserNotFoundException when user does not exist`() {
+            // Arrange
+            val userId = UUID.randomUUID()
+            every { userRepository.findByID(userId) } returns null
+
+            // Act
+            assertThrows<UserNotFoundException> {
+                userService.changePassword(userId, "any", "any")
+            }
+
+            // Assert
+            verify(exactly = 0) { userRepository.update(any()) }
+        }
+
+        @Test
+        fun `should throw InvalidPasswordException when old password does not match`() {
+            // Arrange
+            val oldPassword = "correctOld"
+            val wrongPassword = "wrongOld"
+            val hashedOldPassword = BCrypt.withDefaults().hashToString(12, oldPassword.toCharArray())
+            val user = User.validTestData().copy(password = hashedOldPassword)
+
+            every { userRepository.findByID(user.id!!) } returns mockk()
+            every { userModelMapper.toDomain(any()) } returns user
+
+            // Act / Assert
+            assertThrows<InvalidPasswordException> {
+                userService.changePassword(user.id!!, wrongPassword, "newPass")
+            }
+
+            verify(exactly = 0) { userRepository.update(any()) }
+        }
+    }
 }
 
 
