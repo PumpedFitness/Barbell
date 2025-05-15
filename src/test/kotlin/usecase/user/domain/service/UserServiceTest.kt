@@ -4,6 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import io.mockk.*
 import ord.pumped.usecase.user.domain.mapper.UserModelMapper
 import ord.pumped.usecase.user.domain.model.User
+import ord.pumped.usecase.user.domain.model.testData
 import ord.pumped.usecase.user.domain.service.IUserService
 import ord.pumped.usecase.user.domain.service.UserServiceAdapter
 import ord.pumped.usecase.user.exceptions.EmailAlreadyUsedException
@@ -20,7 +21,6 @@ import org.koin.core.context.GlobalContext.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import usecase.user.testfixtures.UserMother.Companion.createValidUser
 import java.util.*
 import kotlin.test.junit.JUnitAsserter.assertNotEquals
 
@@ -35,7 +35,6 @@ class UserServiceTest : KoinTest {
     @BeforeEach
     fun setup() {
         clearMocks(userRepository, userModelMapper)
-
         startKoin {
             modules(module {
                 single<IUserRepository> { userRepository }
@@ -45,7 +44,6 @@ class UserServiceTest : KoinTest {
         }
         userService = get()
     }
-
 
     @AfterEach
     fun tearDown() {
@@ -57,7 +55,7 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should throw EmailAlreadyUsedException if email is found`() {
             // Arrange
-            val user = createValidUser()
+            val user = User.testData()
             val mockUserDto = mockk<UserDTO>()
 
             every { userRepository.findByEmail(any()) } returns mockUserDto
@@ -71,7 +69,8 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should verify happy path`() {
             // Arrange
-            val user = createValidUser()
+            val user = User.testData()
+
             val userDto = mockk<UserDTO>()
 
             every { userRepository.findByEmail(any()) } returns null
@@ -91,7 +90,7 @@ class UserServiceTest : KoinTest {
         fun `should hash the password before saving the user`() {
             // Arrange
             val plainPassword = "mySecret123"
-            val user = createValidUser().copy(password = plainPassword)
+            val user = User.testData().copy(password = plainPassword)
 
             val capturedUserSlot = slot<User>()
             every { userRepository.findByEmail(user.email) } returns null
@@ -110,7 +109,8 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should map saved UserDTO to domain User`() {
             // Arrange
-            val user = createValidUser()
+            val user = User.testData()
+
             val mockDto = mockk<UserDTO>()
             val mappedUser = mockk<User>()
 
@@ -133,7 +133,8 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should return user when credentials are correct`() {
             // Arrange
-            val user = createValidUser()
+            val user = User.testData()
+
             val rawPassword = "securePassword123"
             val hashedPassword = BCrypt.withDefaults().hashToString(12, rawPassword.toCharArray())
             val userDTO = mockk<UserDTO>(relaxed = true)
@@ -151,7 +152,8 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should throw UserNotFoundException if email is not found`() {
             // Arrange
-            val user = createValidUser()
+            val user = User.testData()
+
             every { userRepository.findByEmail(any()) } returns null
 
             // Act / Assert
@@ -163,7 +165,8 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should throw InvalidPasswordException when password is incorrect`() {
             // Arrange
-            val user = createValidUser()
+            val user = User.testData()
+
             val wrongPassword = "wrongPassword"
             val hashedPassword = BCrypt.withDefaults().hashToString(12, user.password.toCharArray())
             val userDTO = mockk<UserDTO>(relaxed = true)
@@ -185,7 +188,8 @@ class UserServiceTest : KoinTest {
         @Test
         fun `should update user profile successfully`() {
             // Arrange
-            val existingUser = createValidUser()
+            val existingUser = User.testData()
+
 
             val updateRequest = UserUpdateProfileRequest(
                 username = existingUser.username,
@@ -213,7 +217,7 @@ class UserServiceTest : KoinTest {
 
         @Test
         fun `should throw UserNotFoundException when user is not found`() {
-            // Given
+            // Arrange
             val userId = UUID.randomUUID()
             val updateRequest = UserUpdateProfileRequest(
                 username = "john barbell",
@@ -222,7 +226,7 @@ class UserServiceTest : KoinTest {
             )
             every { userRepository.findByID(userId) } returns null
 
-            // Then
+            // Assert / Act
             assertThrows<UserNotFoundException> {
                 userService.updateUserProfile(userId, updateRequest)
             }
@@ -230,3 +234,5 @@ class UserServiceTest : KoinTest {
     }
 
 }
+
+
