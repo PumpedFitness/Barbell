@@ -11,6 +11,7 @@ import ord.pumped.configuration.secrets
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
+import ord.pumped.io.env.ApplicationMode
 import ord.pumped.io.env.EnvVariables
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
@@ -32,8 +33,9 @@ fun Route.userRoutingUnauthed() {
             )
 
             val domain = application.secrets[EnvVariables.BB_JWT_DOMAIN]
+            val isSecure = application.secrets[EnvVariables.BB_MODE] == ApplicationMode.PRODUCTION.name
 
-            call.response.cookies.append(userTokenCookie(response.token!!, domain))
+            call.response.cookies.append(userTokenCookie(response.token!!, domain, isSecure))
             call.respond(HttpStatusCode.OK, response)
         }
     }
