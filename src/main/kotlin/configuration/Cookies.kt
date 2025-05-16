@@ -12,6 +12,7 @@ fun userTokenCookie(token: String, domain: String): Cookie {
         path = "/",
         httpOnly = true,
         domain = domain,
+        secure = true,
         extensions = mapOf("SameSite" to SameSite.Lax)
     )
 }
