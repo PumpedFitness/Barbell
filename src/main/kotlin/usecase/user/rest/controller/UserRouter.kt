@@ -32,8 +32,9 @@ fun Route.userRoutingUnauthed() {
             )
 
             val domain = application.secrets[EnvVariables.BB_JWT_DOMAIN]
+            val isSecure = application.secrets[EnvVariables.BB_MODE] == "PRODUCTION"
 
-            call.response.cookies.append(userTokenCookie(response.token!!, domain))
+            call.response.cookies.append(userTokenCookie(response.token!!, domain, isSecure))
             call.respond(HttpStatusCode.OK, response)
         }
     }
