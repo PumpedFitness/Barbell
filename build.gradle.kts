@@ -72,7 +72,7 @@ dependencies {
 
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("io.ktor:ktor-client-cio:${ktor_version}")
-    implementation("io.github.hansanto:kault:1.5.1")
+    implementation("io.github.hansanto:kault:1.5.2")
     // required for kault
 
     implementation("org.flywaydb:flyway-core:$flyway_version")
