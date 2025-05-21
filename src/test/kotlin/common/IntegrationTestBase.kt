@@ -3,7 +3,6 @@ package common
 import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.PortBinding
 import com.github.dockerjava.api.model.Ports
-import com.redis.testcontainers.RedisContainer
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.testing.*
 import ord.pumped.common.security.service.securityModule
@@ -24,7 +23,7 @@ import org.testcontainers.utility.DockerImageName
 abstract class IntegrationTestBase : KoinTest {
     companion object {
         private lateinit var db: MariaDBContainer<*>
-        private lateinit var redisContainer: RedisContainer
+        private lateinit var redisContainer: GenericContainer<Nothing>
 
         private val dotenv = dotenv {
             filename = ".env"
@@ -41,7 +40,7 @@ abstract class IntegrationTestBase : KoinTest {
                 start()
             }
 
-            val redisContainer = object : GenericContainer<Nothing>("redis:8.0.0") {}.apply {
+            redisContainer = object : GenericContainer<Nothing>("redis:8.0.0") {}.apply {
                 withExposedPorts(dotenv["BB_REDIS_PORT"].toInt())
                 withCreateContainerCmdModifier {
                     it.hostConfig?.withPortBindings(
