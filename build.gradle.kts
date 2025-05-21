@@ -10,6 +10,8 @@ val flyway_version: String by project
 val koin_version: String by project
 val akkurate_version: String by project
 val jupiter_version: String by project
+val test_container_version: String by project
+val ktor_server_tests_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.20"
@@ -109,8 +111,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiter_version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiter_version")
     testImplementation("io.insert-koin:koin-test:$koin_version")
-
-    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2") // ist dependent auf die jupiter version hat aber ein anderen Release
+    testImplementation("org.testcontainers:testcontainers:$test_container_version")
+    testImplementation("org.testcontainers:mariadb:$test_container_version")
+    testImplementation("io.ktor:ktor-server-tests:$ktor_server_tests_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_server_tests_version")
+    testImplementation("io.ktor:ktor-client-cio:$ktor_server_tests_version")
+    implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2") // ist dependent auf die junit version hat aber ein anderen Release
 }
 
 tasks.withType<Test> {
