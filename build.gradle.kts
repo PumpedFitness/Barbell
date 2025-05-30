@@ -96,7 +96,7 @@ dependencies {
     implementation("dev.hayden:khealth:3.0.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.2.1")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.2.1")
-    implementation("io.github.damirdenis-tudor:ktor-server-rabbitmq:1.3.4")
+    implementation("io.github.damirdenis-tudor:ktor-server-rabbitmq:1.3.5")
     ksp("dev.nesk.akkurate:akkurate-ksp-plugin:0.11.0")
 
     implementation("at.favre.lib:bcrypt:0.10.2")
