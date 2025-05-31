@@ -12,6 +12,7 @@ import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
 import ord.pumped.io.env.EnvVariables
+import ord.pumped.io.websocket.WebsocketController
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
 import ord.pumped.usecase.user.rest.request.actions.NotifyUserAction
@@ -79,9 +80,8 @@ fun Route.userRoutingAuthed() {
 
         delete("/logout") {
             UserController.logoutUser(call.tokenID())
+            WebsocketController.destroyWebsocket(call.userID())
             call.respond(HttpStatusCode.OK)
         }
-
     }
-
 }
