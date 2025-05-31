@@ -70,7 +70,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
                             continue@wsLoop
                         }
 
-                        val user = getUserForSession(session) ?: return@async close(session, unauthorizedCloseReason)
+                         val user = getUserForSession(session) ?: return@async close(session, unauthorizedCloseReason)
 
                         val notifications = websocketRouter.routePath(websocketAction.path, data.jsonObject, user)
                         notifications?.let { notifySession(session, it, uuid) }
@@ -101,12 +101,12 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
     }
 
     override fun sendNotificationToUser(uuid: UUID, notification: IWebsocketNotification) {
-        val session = websockets[uuid] ?: return
+        val session = websockets[getSessionIDForUser(uuid)] ?: return
         sendToSession(session.websocket, notification)
     }
 
     override fun getOnlineUsers(): List<UUID> {
-        return websockets.keys.toList()
+        return websockets.values.mapNotNull { it.user }.map { it.id!! }
     }
 
     override fun sendNotificationToAllUsers(notification: IWebsocketNotification) {
@@ -150,6 +150,12 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         }
     }
 
+    override fun closeForUser(userID: UUID) {
+        val socketID = getSessionIDForUser(userID)
+        val socket = websockets[socketID]
+        socket?.let { close(it.websocket, defaultCloseReason) }
+    }
+
     private fun decodeActionFromString(content: String): DefaultWebsocketAction? {
         return try {
             json.decodeFromString<DefaultWebsocketAction>(content)
@@ -159,9 +165,14 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         }
     }
 
+    private fun getSessionIDForUser(userID: UUID): UUID? {
+        return websockets.filter { it.value.user?.id == userID }.keys.firstOrNull()
+    }
+
     override fun hasSession(sessionID: UUID): Boolean {
         return websockets.keys.any { it == sessionID }
     }
+
 
     override fun associateUserWithSocketID(sessionID: UUID, user: User) {
         val websocket = websockets[sessionID] ?: return
@@ -183,4 +194,4 @@ data class BarbellWebsocket(
 )
 
 private val unauthorizedCloseReason = CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Unauthorized")
-val defaultCloseReason = CloseReason(CloseReason.Codes.NORMAL, "Closes by host")
+val defaultCloseReason = CloseReason(CloseReason.Codes.NORMAL, "Closed by host")

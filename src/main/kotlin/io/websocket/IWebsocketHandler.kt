@@ -23,4 +23,6 @@ interface IWebsocketHandler: KoinComponent {
     fun associateUserWithSocketID(sessionID: UUID, user: User)
 
     fun close(session: DefaultWebSocketSession, closeReason: CloseReason = defaultCloseReason)
+
+    fun closeForUser(userID: UUID)
 }

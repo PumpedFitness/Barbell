@@ -6,15 +6,11 @@ import ord.pumped.io.defaultJson
 import ord.pumped.io.websocket.routing.messaging.IWebsocketResponse
 
 @Serializable
-class UUIDResponse(val id: String): IWebsocketResponse {
-
-    override val shouldNotify: Boolean
-        get() = false
-    override val message: String
-        get() = "UUID"
-    override val status: Boolean
-        get() = true
-
+class UUIDResponse(val id: String,
+                   override val shouldNotify: Boolean = true,
+                   override val message: String = "UUID",
+                   override val status: Boolean = true
+): IWebsocketResponse {
     override fun asJson(): JsonElement {
         return defaultJson.encodeToJsonElement(serializer(), this)
     }
