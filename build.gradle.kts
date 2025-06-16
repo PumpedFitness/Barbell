@@ -79,7 +79,7 @@ dependencies {
     implementation("org.flywaydb:flyway-mysql:$flyway_version")
 
     implementation("com.ucasoft.ktor:ktor-simple-cache:0.53.4")
-    implementation("com.ucasoft.ktor:ktor-simple-redis-cache:0.53.4")
+    implementation("com.ucasoft.ktor:ktor-simple-redis-cache:0.55.3")
     implementation("io.github.flaxoos:ktor-server-rate-limiting:2.2.1")
     implementation("io.github.smiley4:ktor-openapi:5.0.2")
     implementation("io.github.smiley4:ktor-swagger-ui:5.0.2")
