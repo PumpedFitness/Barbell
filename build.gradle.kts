@@ -12,7 +12,7 @@ val akkurate_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.21"
-    id("io.ktor.plugin") version "3.1.3"
+    id("io.ktor.plugin") version "3.2.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.21"
     id("org.flywaydb.flyway") version "11.9.1"
     id("com.google.devtools.ksp") version "2.1.21-2.0.2"
@@ -92,7 +92,7 @@ dependencies {
 
     implementation("dev.nesk.akkurate:akkurate-ktor-server:$akkurate_version")
     implementation("dev.nesk.akkurate:akkurate-core:$akkurate_version")
-    implementation("io.ktor:ktor-server-metrics:3.1.3")
+    implementation("io.ktor:ktor-server-metrics:$ktor_version")
     implementation("dev.hayden:khealth:3.0.2")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-core:2.2.1")
     implementation("io.github.flaxoos:ktor-server-task-scheduling-redis:2.2.1")
