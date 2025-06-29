@@ -7,7 +7,7 @@ import ord.pumped.common.APIException
 
 class UnauthorizedException : APIException("Unauthorized") {
 
-    override suspend fun handle(call: ApplicationCall) {
+    override suspend fun handleLogic(call: ApplicationCall) {
         call.respondText("You are not authorized to perform this operation", status = HttpStatusCode.Unauthorized)
     }
 

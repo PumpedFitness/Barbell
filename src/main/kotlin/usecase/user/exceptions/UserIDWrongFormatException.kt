@@ -7,7 +7,7 @@ import ord.pumped.common.APIException
 
 class UserIDWrongFormatException : APIException("UserID has to be a valid UUID") {
 
-    override suspend fun handle(call: ApplicationCall) {
+    override suspend fun handleLogic(call: ApplicationCall) {
         call.respondText("UserID has to be a valid UUID", status = HttpStatusCode.BadRequest)
 
     }

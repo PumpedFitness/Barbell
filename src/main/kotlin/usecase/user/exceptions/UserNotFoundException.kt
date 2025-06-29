@@ -7,7 +7,7 @@ import ord.pumped.common.APIException
 
 class UserNotFoundException: APIException("User not found") {
 
-    override suspend fun handle(call: ApplicationCall) {
+    override suspend fun handleLogic(call: ApplicationCall) {
         call.respondText("User not found", status = HttpStatusCode.BadRequest)
     }
 }

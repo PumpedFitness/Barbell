@@ -1,5 +1,6 @@
 package ord.pumped.util
 
+import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KProperty
@@ -30,12 +31,12 @@ interface Loggable {
     fun <T> withLogging(
         operationName: String,
         vararg params: Pair<String, Any?>,
-        block: () -> T
+        block: suspend () -> T
     ): T {
         val paramStr = params.joinToString(", ") { (key, value) -> "$key=${value.toString()}" }
         log.info("\'$operationName\' with parameters: $paramStr")
         return try {
-            val result = block()
+            val result = runBlocking { block() }
             result
         } catch (e: Exception) {
             log.error("Exception while \'$operationName\' with parameters: $paramStr", e)
