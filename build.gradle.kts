@@ -11,7 +11,7 @@ val koin_version: String by project
 val akkurate_version: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.21"
+    kotlin("jvm") version "2.2.0"
     id("io.ktor.plugin") version "3.2.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.21"
     id("org.flywaydb.flyway") version "11.9.1"
