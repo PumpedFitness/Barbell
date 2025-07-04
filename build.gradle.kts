@@ -15,7 +15,7 @@ plugins {
     id("io.ktor.plugin") version "3.2.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
     id("org.flywaydb.flyway") version "11.10.1"
-    id("com.google.devtools.ksp") version "2.1.21-2.0.2"
+    id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 }
 
 repositories {
