@@ -5,5 +5,8 @@ import ord.pumped.usecase.user.domain.model.User
 import ord.pumped.usecase.user.persistence.dto.UserDTO
 
 interface IUserRepository : IRepository<User, UserDTO> {
-    fun findByEmail(email: String): UserDTO?
+    fun findByEmailLogic(email: String): UserDTO?
+    fun findByEmail(email: String): UserDTO? = withLogging("findByEmail", "email" to email) {
+        findByEmailLogic(email)
+    }
 }

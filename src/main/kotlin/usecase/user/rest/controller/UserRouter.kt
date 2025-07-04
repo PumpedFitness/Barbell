@@ -23,7 +23,6 @@ fun Route.userRoutingUnauthed() {
             val response = UserController.registerUser(
                 call.receive<UserRegisterRequest>()
             )
-
             call.respond(HttpStatusCode.Created, response)
         }
         post("/login") {

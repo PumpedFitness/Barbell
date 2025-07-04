@@ -6,7 +6,7 @@ import io.ktor.server.response.*
 import ord.pumped.common.APIException
 
 class EmailAlreadyUsedException : APIException("Email is already used") {
-    override suspend fun handle(call: ApplicationCall) {
+    override suspend fun handleLogic(call: ApplicationCall) {
         call.respondText("Email is already used", status = HttpStatusCode.Conflict)
     }
 }
