@@ -1,0 +1,2 @@
+ALTER TABLE barbell_users
+    MODIFY COLUMN id BINARY(36) NOT NULL;
