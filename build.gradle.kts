@@ -81,8 +81,8 @@ dependencies {
     implementation("com.ucasoft.ktor:ktor-simple-cache:0.55.3")
     implementation("com.ucasoft.ktor:ktor-simple-redis-cache:0.55.3")
     implementation("io.github.flaxoos:ktor-server-rate-limiting:2.2.1")
-    implementation("io.github.smiley4:ktor-openapi:5.1.0")
-    implementation("io.github.smiley4:ktor-swagger-ui:5.1.0")
+    implementation("io.github.smiley4:ktor-openapi:5.2.0")
+    implementation("io.github.smiley4:ktor-swagger-ui:5.2.0")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("com.github.StaticFX:ktor-middleware:v1.1.1")
