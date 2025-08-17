@@ -49,6 +49,25 @@ repositories {
     }
 }
 
+sourceSets {
+    create("integrationTest") {
+        kotlin {
+            srcDir("src/integration/kotlin")
+        }
+        resources {
+            srcDir("src/integration/resources")
+        }
+        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
+        runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().output
+    }
+}
+
+val integrationTestImplementation by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+
+
 dependencies {
     implementation("io.ktor:ktor-server-cio:$ktor_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
@@ -127,10 +146,23 @@ tasks.withType<Test> {
 
     }
 }
-
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-XXLanguage:+BreakContinueInInlineLambdas"))
+}
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests"
+    group = "verification"
+
+    testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+    classpath = sourceSets["integrationTest"].runtimeClasspath
+
+    useJUnitPlatform()
+}
+
+tasks.named("check") {
+    dependsOn("integrationTest")
 }
 
 jib {
