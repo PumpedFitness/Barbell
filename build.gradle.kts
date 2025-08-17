@@ -67,6 +67,22 @@ val integrationTestImplementation by configurations.getting {
 }
 configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+        )
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
 
 dependencies {
     implementation("io.ktor:ktor-server-cio:$ktor_version")
@@ -163,6 +179,29 @@ tasks.register<Test>("integrationTest") {
 
 tasks.named("check") {
     dependsOn("integrationTest")
+}
+
+// For unit tests
+tasks.named<Test>("test") {
+    testLogging {
+        events("passed", "skipped", "failed")
+        displayGranularity = 2
+        showStackTraces = true
+        showExceptions = true
+        showCauses = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
+tasks.named<Test>("integrationTest") {
+    testLogging {
+        events("passed", "skipped", "failed")
+        displayGranularity = 2
+        showStackTraces = true
+        showExceptions = true
+        showCauses = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
 }
 
 jib {
