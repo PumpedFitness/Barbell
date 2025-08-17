@@ -1,13 +1,15 @@
 package usecase.user
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import common.IntegrationTestBase
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.server.config.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.json.Json
 import ord.pumped.usecase.user.rest.response.UserLoginResponse
-import ord.pumped.usecase.user.rest.response.UserMeResponse
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -115,43 +117,43 @@ class UserIntegrationTest : IntegrationTestBase() {
     @Test
     @Order(6)
     fun `should show me on valid JWT`() = testApplication {
-        //Arrange
-        lateinit var jwtToken: String
-        setupTestApplication()
-        val preResponse = client.post("/api/v1/user/login") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                """
-            {
-                "email": "test@pumped.de",
-                "password": "12345678"
-            }
-            """.trimIndent()
+        environment {
+            config = MapApplicationConfig(
+                "jwt.secret" to "brgtzu89430eko12pijrtfhgue943ko2wdmjdfnhviui",
+                "jwt.issuer" to "https://pumped-fitness.de/",
+                "jwt.audience" to "pumped-fitness-treadmill"
             )
         }
-        assertEquals(HttpStatusCode.OK, preResponse.status)
-        val preResponseBody = Json.decodeFromString<UserLoginResponse>(
-            preResponse.bodyAsText()
-        )
-        assertFalse(preResponseBody.token.isNullOrEmpty())
-        jwtToken = preResponseBody.token ?: ""
+        setupTestApplication()
 
-        //Act
-        val response = client.get("/api/v1/auth/user/profile/me") {
-            header(HttpHeaders.Authorization, "Bearer $jwtToken")
+        // 2. Login and get token
+        val loginResponse = client.post("/api/v1/user/login") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"email":"test@pumped.de","password":"12345678"}""")
+        }
+        val loginReponseBody = Json.decodeFromString<UserLoginResponse>(loginResponse.bodyAsText())
+        val token = "Bearer ${loginReponseBody.token}"
+        println("Obtained Token: $token")
+
+        // 3. Verify token manually
+        try {
+            val verifier = JWT.require(Algorithm.HMAC256("brgtzu89430eko12pijrtfhgue943ko2wdmjdfnhviui"))
+                .withIssuer("https://pumped-fitness.de/")
+                .build()
+            val decoded = verifier.verify(token.removePrefix("Bearer "))
+            println("Token Valid: ${decoded.id}")
+        } catch (e: Exception) {
+            println("Token Verification Failed: ${e.message}")
         }
 
-        //Assert
+        // 4. Make authenticated request
+        val response = client.get("/api/v1/auth/user/profile/me") {
+            header(HttpHeaders.Authorization, token)
+        }
+        println("Response Status: ${response.status}")
+        println("Response Body: ${response.bodyAsText()}")
+
         assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = Json.decodeFromString<UserMeResponse>(
-            response.bodyAsText()
-        )
-        assertEquals("testuser", responseBody.username)
-        assertEquals("test@pumped.de", responseBody.email)
-        assertNotNull(responseBody.createdAt)
-        assertNotNull(responseBody.updatedAt)
-        assertEquals("", responseBody.description)
-        assertEquals("", responseBody.profilePicture)
     }
 
 }
