@@ -109,46 +109,28 @@ class UserIntegrationTest : IntegrationTestBase() {
         Assertions.assertEquals(HttpStatusCode.Companion.Unauthorized, response.status)
     }
 
-//    @Test
-//    @Order(6)
-//    fun `should show me on valid JWT`() = testApplication {
-//        environment {
-//            config = MapApplicationConfig(
-//                "jwt.secret" to "brgtzu89430eko12pijrtfhgue943ko2wdmjdfnhviui",
-//                "jwt.issuer" to "https://pumped-fitness.de/",
-//                "jwt.audience" to "pumped-fitness-treadmill"
-//            )
-//        }
-//        setupTestApplication()
-//
-//        // 2. Login and get token
-//        val loginResponse = client.post(loginRoute) {
-//            contentType(ContentType.Application.Json)
-//            setBody("""{"email":"test@pumped.de","password":"12345678"}""")
-//        }
-//        val loginReponseBody = Json.Default.decodeFromString<UserLoginResponse>(loginResponse.bodyAsText())
-//        val token = "Bearer ${loginReponseBody.token}"
-//        println("Obtained Token: $token")
-//
-//        // 3. Verify token manually
-//        try {
-//            val verifier = JWT.require(Algorithm.HMAC256("brgtzu89430eko12pijrtfhgue943ko2wdmjdfnhviui"))
-//                .withIssuer("https://pumped-fitness.de/")
-//                .build()
-//            val decoded = verifier.verify(token.removePrefix("Bearer "))
-//            println("Token Valid: ${decoded.id}")
-//        } catch (e: Exception) {
-//            println("Token Verification Failed: ${e.message}")
-//        }
-//
-//        // 4. Make authenticated request
-//        val response = client.get("/api/v1/auth/user/profile/me") {
-//            header(HttpHeaders.Authorization, token)
-//        }
-//        println("Response Status: ${response.status}")
-//        println("Response Body: ${response.bodyAsText()}")
-//
-//        Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
-//    }
+    @Test
+    @Order(6)
+    fun `should show me on valid JWT`() = testApplication {
+        setupTestApplication()
+
+        // 2. Login and get token
+        val loginResponse = client.post(loginRoute) {
+            contentType(ContentType.Application.Json)
+            setBody("""{"email":"test@pumped.de","password":"12345678"}""")
+        }
+        val loginReponseBody = Json.Default.decodeFromString<UserLoginResponse>(loginResponse.bodyAsText())
+        val token = "Bearer ${loginReponseBody.token}"
+        println("Obtained Token: $token")
+
+        // 4. Make authenticated request
+        val response = client.get("/api/v1/auth/user/profile/me") {
+            header(HttpHeaders.Authorization, token)
+        }
+        println("Response Status: ${response.status}")
+        println("Response Body: ${response.bodyAsText()}")
+
+        Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
+    }
 
 }
