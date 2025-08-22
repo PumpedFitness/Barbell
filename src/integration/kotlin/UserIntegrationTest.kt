@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.json.Json
 import ord.pumped.usecase.user.rest.response.UserLoginResponse
+import ord.pumped.usecase.user.rest.response.UserMeResponse
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
 import org.junit.jupiter.api.*
 
@@ -12,6 +13,15 @@ import org.junit.jupiter.api.*
 class UserIntegrationTest : IntegrationTestBase() {
     val loginRoute = "/api/v1/user/login"
     val registerRoute = "/api/v1/user/register"
+    val meRoute = "/api/v1/auth/user/profile/me"
+    val logoutRoute = "/api/v1/auth/user/logout"
+    val passwordUpdateRoute = "/api/v1/auth/user/update/password"
+    val profileUpdateRoute = "/api/v1/auth/user/profile/update"
+    val userDeletionRoute = "/api/v1/auth/user/delete"
+
+    companion object {
+        private lateinit var sharedJwtToken: String
+    }
 
     @Test
     @Order(1)
@@ -92,45 +102,126 @@ class UserIntegrationTest : IntegrationTestBase() {
         val responseBody = Json.Default.decodeFromString<UserLoginResponse>(
             response.bodyAsText()
         )
+        sharedJwtToken = responseBody.token ?: "empty token"
         Assertions.assertEquals("test@pumped.de", responseBody.email)
         assertNotNull(responseBody.username)
         Assertions.assertFalse(responseBody.token.isNullOrEmpty())
     }
 
     @Test
-    @Order(5)
+    @Order(4)
     fun `should reject request with invalid JWT`() = testApplication {
+        //Arrange
         setupTestApplication()
 
-        val response = client.get("/api/v1/auth/user/profile/me") {
+        // Act
+        val response = client.get(meRoute) {
             header(HttpHeaders.Authorization, "Bearer invalid_token_here")
         }
 
+        // Assert
         Assertions.assertEquals(HttpStatusCode.Companion.Unauthorized, response.status)
+    }
+
+    @Test
+    @Order(5)
+    fun `should logout a user successfully`() = testApplication {
+        // Arrange
+        setupTestApplication()
+
+        // Act
+        val response = client.delete(logoutRoute) {
+            header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
+        }
+
+        Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
     }
 
     @Test
     @Order(6)
     fun `should show me on valid JWT`() = testApplication {
+        // Arrange
         setupTestApplication()
-
-        // 2. Login and get token
         val loginResponse = client.post(loginRoute) {
             contentType(ContentType.Application.Json)
             setBody("""{"email":"test@pumped.de","password":"12345678"}""")
         }
         val loginReponseBody = Json.Default.decodeFromString<UserLoginResponse>(loginResponse.bodyAsText())
-        val token = "Bearer ${loginReponseBody.token}"
-        println("Obtained Token: $token")
+        sharedJwtToken = loginReponseBody.token ?: "empty token"
 
-        // 4. Make authenticated request
-        val response = client.get("/api/v1/auth/user/profile/me") {
-            header(HttpHeaders.Authorization, token)
+        // Act
+        val response = client.get(meRoute) {
+            header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
         }
-        println("Response Status: ${response.status}")
-        println("Response Body: ${response.bodyAsText()}")
+        val responseBody = Json.Default.decodeFromString<UserMeResponse>(response.bodyAsText())
 
+        // Assert
+        Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
+        Assertions.assertEquals("test@pumped.de", responseBody.email)
+        Assertions.assertEquals("testuser", responseBody.username)
+        Assertions.assertNotNull(responseBody.description)
+        Assertions.assertNotNull(responseBody.profilePicture)
+        Assertions.assertNotNull(responseBody.createdAt)
+        Assertions.assertNotNull(responseBody.updatedAt)
+        Assertions.assertNotNull(responseBody.id)
+    }
+
+    @Test
+    @Order(7)
+    fun `should update password on existing user`() = testApplication {
+        // Arrange
+        setupTestApplication()
+
+        // Act
+        val response = client.put(passwordUpdateRoute) {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
+            setBody("""{"oldPassword":"12345678","newPassword":"newPassword123"}""")
+        }
+
+        //Assert
         Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
     }
 
+    @Test
+    @Order(8)
+    fun `should update profile on existing user`() = testApplication {
+        // Arrange
+        setupTestApplication()
+
+        // Act
+        val response = client.put(profileUpdateRoute) {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
+            setBody("""{"username":"Change","description":"Description","profilePicture":"ProfilePicture"}""")
+        }
+        val responseBody = Json.Default.decodeFromString<UserMeResponse>(response.bodyAsText())
+
+        // Assert
+        Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
+        Assertions.assertEquals("test@pumped.de", responseBody.email)
+        Assertions.assertEquals("Change", responseBody.username)
+        Assertions.assertEquals("Description", responseBody.description)
+        Assertions.assertEquals("ProfilePicture", responseBody.profilePicture)
+        Assertions.assertNotNull(responseBody.createdAt)
+        Assertions.assertNotNull(responseBody.updatedAt)
+        Assertions.assertNotNull(responseBody.id)
+    }
+
+    @Test
+    @Order(9)
+    fun `should delete existing user`() = testApplication {
+        // Arrange
+        setupTestApplication()
+
+        // Act
+        val response = client.delete(userDeletionRoute) {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
+            setBody("""{"password":"newPassword123"}""")
+        }
+
+        // Assert
+        Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
+    }
 }
