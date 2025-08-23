@@ -28,3 +28,11 @@ val validateUserRegisterRequest = Validator<UserRegisterRequest> {
     email.isMatching(Regex("^[\\w\\-]+@([\\w-]+\\.)+[\\w-]{2,}$"))
 }
 
+
+fun UserRegisterRequest.Companion.testRequest(): UserRegisterRequest {
+    return UserRegisterRequest(
+        email = "test@pumped.de",
+        password = "12345678",
+        username = "testuser"
+    )
+}

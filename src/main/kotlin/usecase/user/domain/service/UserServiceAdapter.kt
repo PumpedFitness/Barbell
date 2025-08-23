@@ -45,7 +45,6 @@ class UserServiceAdapter : IUserService, KoinComponent {
         return userModelMapper.toDomain(user)
     }
 
-
     override fun updateUserProfile(
         userID: UUID,
         receive: UserUpdateProfileRequest
@@ -53,9 +52,9 @@ class UserServiceAdapter : IUserService, KoinComponent {
         var existingUser = getUser(userID)
         existingUser = existingUser.copy(
             updatedAt = Clock.System.now(),
-            username = existingUser.username,
-            description = receive.description,
-            profilePicture = receive.profilePicture
+            username = receive.username ?: existingUser.username,
+            description = receive.description ?: existingUser.description,
+            profilePicture = receive.profilePicture ?: existingUser.profilePicture
         )
         return userModelMapper.toDomain(userRepository.update(existingUser))
     }
