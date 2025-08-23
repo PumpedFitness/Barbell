@@ -19,3 +19,11 @@ val validateUpdateProfileRequest = Validator<UserUpdateProfileRequest> {
     description.hasLengthLowerThanOrEqualTo(500)
     profilePicture.hasLengthLowerThanOrEqualTo(250)
 }
+
+fun UserUpdateProfileRequest.Companion.testRequest(): UserUpdateProfileRequest {
+    return UserUpdateProfileRequest(
+        username = "Change",
+        description = "Description",
+        profilePicture = "ProfilePicture"
+    )
+}

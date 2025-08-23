@@ -18,3 +18,10 @@ val validateUserUpdatePasswordRequest = Validator<UserUpdatePasswordRequest> {
     newPassword.hasLengthBetween(IntRange(8, 255))
     newPassword.isMatching(Regex("^[a-zA-Z0-9!@#\$%^&*()\\-_=+\\[\\]\\\\{}|;:'.,<>/?]*$"))
 }
+
+fun UserUpdatePasswordRequest.Companion.testRequest(): UserUpdatePasswordRequest {
+    return UserUpdatePasswordRequest(
+        oldPassword = "12345678",
+        newPassword = "newPassword123"
+    )
+}
