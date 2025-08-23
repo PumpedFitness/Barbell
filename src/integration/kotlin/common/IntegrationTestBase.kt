@@ -40,7 +40,7 @@ abstract class IntegrationTestBase : KoinTest {
                 )
                 start()
             }
-            print("started mariadb container with name: ${db.containerName}, id: ${db.containerId}, and url: ${db.jdbcUrl}, user: ${db.username}, password: ${db.password}, database: ${db.databaseName}, port: ${db.firstMappedPort}, and host: ${db.host}")
+            println("started mariadb container with name: ${db.containerName}, id: ${db.containerId}, and url: ${db.jdbcUrl}, user: ${db.username}, password: ${db.password}, database: ${db.databaseName}, port: ${db.firstMappedPort}, and host: ${db.host}")
 
             redisContainer = object : GenericContainer<Nothing>("redis:8.0.0") {}.apply {
                 withExposedPorts(dotenv["BB_REDIS_PORT"].toInt())
@@ -49,7 +49,7 @@ abstract class IntegrationTestBase : KoinTest {
                 )
                 start()
             }
-            print(
+            println(
                 "started redis container with name: ${redisContainer.containerName}, id: ${redisContainer.containerId}, and port: ${
                     redisContainer.getMappedPort(
                         dotenv["BB_REDIS_PORT"].toInt()
