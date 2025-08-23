@@ -9,6 +9,9 @@ val ktor_version: String by project
 val flyway_version: String by project
 val koin_version: String by project
 val akkurate_version: String by project
+val jupiter_version: String by project
+val test_container_version: String by project
+val ktor_server_tests_version: String by project
 
 plugins {
     kotlin("jvm") version "2.2.0"
@@ -43,6 +46,41 @@ repositories {
     maven {
         url = uri("https://packages.confluent.io/maven")
         name = "confluence"
+    }
+}
+
+sourceSets {
+    create("integrationTest") {
+        kotlin {
+            srcDir("src/integration/kotlin")
+        }
+        resources {
+            srcDir("src/integration/resources")
+        }
+        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
+        runtimeClasspath += sourceSets.main.get().output + sourceSets.test.get().output
+    }
+}
+
+val integrationTestImplementation by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+configurations["integrationTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+        )
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 }
 
@@ -104,12 +142,68 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("io.mockk:mockk:1.14.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiter_version")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiter_version")
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+    testImplementation("org.testcontainers:testcontainers:$test_container_version")
+    testImplementation("org.testcontainers:mariadb:$test_container_version")
+    testImplementation("io.ktor:ktor-server-tests:$ktor_server_tests_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_server_tests_version")
+    testImplementation("io.ktor:ktor-client-cio:$ktor_server_tests_version")
+    implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2") // ist dependent auf die junit version hat aber ein anderen Release
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+
+    }
+}
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-XXLanguage:+BreakContinueInInlineLambdas"))
 }
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests"
+    group = "verification"
+
+    testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+    classpath = sourceSets["integrationTest"].runtimeClasspath
+
+    useJUnitPlatform()
+}
+
+tasks.named("check") {
+    dependsOn("integrationTest")
+}
+
+// For unit tests
+tasks.named<Test>("test") {
+    testLogging {
+        events("passed", "skipped", "failed")
+        displayGranularity = 2
+        showStackTraces = true
+        showExceptions = true
+        showCauses = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
+tasks.named<Test>("integrationTest") {
+    testLogging {
+        events("passed", "skipped", "failed")
+        displayGranularity = 2
+        showStackTraces = true
+        showExceptions = true
+        showCauses = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
 jib {
     from {
         image = "eclipse-temurin:21-jdk"
