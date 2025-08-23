@@ -8,3 +8,10 @@ data class UserLoginResponse(
     val username: String,
     var token: String? = "",
 )
+
+fun UserLoginResponse.Companion.testResponse(): UserLoginResponse {
+    return UserLoginResponse(
+        email = "test@pumped.de",
+        username = "testuser",
+    )
+}

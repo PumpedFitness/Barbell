@@ -4,9 +4,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.json.Json
+import ord.pumped.usecase.user.rest.request.*
 import ord.pumped.usecase.user.rest.response.UserLoginResponse
 import ord.pumped.usecase.user.rest.response.UserMeResponse
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
+import ord.pumped.usecase.user.rest.response.testResponse
 import org.junit.jupiter.api.*
 
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
@@ -18,6 +20,10 @@ class UserIntegrationTest : IntegrationTestBase() {
     val passwordUpdateRoute = "/api/v1/auth/user/update/password"
     val profileUpdateRoute = "/api/v1/auth/user/profile/update"
     val userDeletionRoute = "/api/v1/auth/user/delete"
+    val loginRequest = Json.encodeToString(UserLoginRequest.testRequest()).trimIndent()
+    val registerRequest = Json.encodeToString(UserRegisterRequest.testRequest()).trimIndent()
+    val userUpdatePasswordRequest = Json.encodeToString(UserUpdatePasswordRequest.testRequest()).trimIndent()
+    val userUpdateProfileRequest = Json.encodeToString(UserUpdateProfileRequest.testRequest()).trimIndent()
 
     companion object {
         private lateinit var sharedJwtToken: String
@@ -36,14 +42,7 @@ class UserIntegrationTest : IntegrationTestBase() {
             //Act
             val response = client.post(loginRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                {
-                    "email": "test@pumped.de",
-                    "password": "12345678"
-                }
-                """.trimIndent()
-                )
+                setBody(loginRequest)
             }
 
             //Assert
@@ -56,28 +55,21 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should register a user successfully`() = testApplication {
             // Arrange
             setupTestApplication()
+            val expectedResponse = UserRegisterResponse.testResponse()
 
             // Act
             val response = client.post(registerRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-            {
-                "email": "test@pumped.de",
-                "password": "12345678",
-                "username": "testuser"
-            }
-            """.trimIndent()
-                )
+                setBody(registerRequest)
             }
 
             // Assert
             Assertions.assertEquals(HttpStatusCode.Companion.Created, response.status)
-            val responseBody = Json.Default.decodeFromString<UserRegisterResponse>(
+            val responseBody = Json.decodeFromString<UserRegisterResponse>(
                 response.bodyAsText()
             )
-            Assertions.assertEquals("testuser", responseBody.username)
-            Assertions.assertEquals("test@pumped.de", responseBody.email)
+            Assertions.assertEquals(expectedResponse.username, responseBody.username)
+            Assertions.assertEquals(expectedResponse.email, responseBody.email)
             assertNotNull(responseBody.createdAt)
             assertNotNull(responseBody.updatedAt)
         }
@@ -87,28 +79,22 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should login a user successfully`() = testApplication {
             //Arrange
             setupTestApplication()
+            val expectedResponse = UserLoginResponse.testResponse()
 
             //Act
             val response = client.post(loginRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-            {
-                "email": "test@pumped.de",
-                "password": "12345678"
-            }
-            """.trimIndent()
-                )
+                setBody(loginRequest)
             }
 
             //Assert
             Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
-            val responseBody = Json.Default.decodeFromString<UserLoginResponse>(
+            val responseBody = Json.decodeFromString<UserLoginResponse>(
                 response.bodyAsText()
             )
             sharedJwtToken = responseBody.token ?: "empty token"
-            Assertions.assertEquals("test@pumped.de", responseBody.email)
-            assertNotNull(responseBody.username)
+            Assertions.assertEquals(expectedResponse.email, responseBody.email)
+            Assertions.assertEquals(expectedResponse.username, responseBody.username)
             Assertions.assertFalse(responseBody.token.isNullOrEmpty())
         }
 
@@ -146,23 +132,25 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should show me on valid JWT`() = testApplication {
             // Arrange
             setupTestApplication()
+            val expectedResponse = UserMeResponse.testResponse()
             val loginResponse = client.post(loginRoute) {
                 contentType(ContentType.Application.Json)
-                setBody("""{"email":"test@pumped.de","password":"12345678"}""")
+                setBody(loginRequest)
             }
-            val loginReponseBody = Json.Default.decodeFromString<UserLoginResponse>(loginResponse.bodyAsText())
+            Assertions.assertEquals(HttpStatusCode.Companion.OK, loginResponse.status)
+            val loginReponseBody = Json.decodeFromString<UserLoginResponse>(loginResponse.bodyAsText())
             sharedJwtToken = loginReponseBody.token ?: "empty token"
 
             // Act
             val response = client.get(meRoute) {
                 header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
             }
-            val responseBody = Json.Default.decodeFromString<UserMeResponse>(response.bodyAsText())
+            val responseBody = Json.decodeFromString<UserMeResponse>(response.bodyAsText())
 
             // Assert
             Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
-            Assertions.assertEquals("test@pumped.de", responseBody.email)
-            Assertions.assertEquals("testuser", responseBody.username)
+            Assertions.assertEquals(expectedResponse.email, responseBody.email)
+            Assertions.assertEquals(expectedResponse.username, responseBody.username)
             Assertions.assertNotNull(responseBody.description)
             Assertions.assertNotNull(responseBody.profilePicture)
             Assertions.assertNotNull(responseBody.createdAt)
@@ -180,7 +168,7 @@ class UserIntegrationTest : IntegrationTestBase() {
             val response = client.put(passwordUpdateRoute) {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
-                setBody("""{"oldPassword":"12345678","newPassword":"newPassword123"}""")
+                setBody(userUpdatePasswordRequest)
             }
 
             //Assert
@@ -192,21 +180,26 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should update profile on existing user`() = testApplication {
             // Arrange
             setupTestApplication()
+            val expectedResponse = UserMeResponse.testResponse().copy(
+                username = "Change",
+                description = "Description",
+                profilePicture = "ProfilePicture"
+            )
 
             // Act
             val response = client.put(profileUpdateRoute) {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
-                setBody("""{"username":"Change","description":"Description","profilePicture":"ProfilePicture"}""")
+                setBody(userUpdateProfileRequest)
             }
-            val responseBody = Json.Default.decodeFromString<UserMeResponse>(response.bodyAsText())
+            val responseBody = Json.decodeFromString<UserMeResponse>(response.bodyAsText())
 
             // Assert
             Assertions.assertEquals(HttpStatusCode.Companion.OK, response.status)
-            Assertions.assertEquals("test@pumped.de", responseBody.email)
-            Assertions.assertEquals("Change", responseBody.username)
-            Assertions.assertEquals("Description", responseBody.description)
-            Assertions.assertEquals("ProfilePicture", responseBody.profilePicture)
+            Assertions.assertEquals(expectedResponse.email, responseBody.email)
+            Assertions.assertEquals(expectedResponse.username, responseBody.username)
+            Assertions.assertEquals(expectedResponse.description, responseBody.description)
+            Assertions.assertEquals(expectedResponse.profilePicture, responseBody.profilePicture)
             Assertions.assertNotNull(responseBody.createdAt)
             Assertions.assertNotNull(responseBody.updatedAt)
             Assertions.assertNotNull(responseBody.id)
@@ -222,7 +215,7 @@ class UserIntegrationTest : IntegrationTestBase() {
             val response = client.delete(userDeletionRoute) {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
-                setBody("""{"password":"newPassword123"}""")
+                setBody(Json.encodeToString(UserDeleteUserRequest.testRequest()).trimIndent())
             }
 
             // Assert
@@ -239,29 +232,21 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should reject registering with duplicate email`() = testApplication {
             // Arrange
             setupTestApplication()
-            val email = "dup@pumped.de"
-            val first = client.post(registerRoute) {
+            val firstRequest = client.post(registerRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"12345678","username":"dupUser"}
-                    """.trimIndent()
-                )
+                setBody(registerRequest)
             }
+
             // Act
-            val second = client.post(registerRoute) {
+            val secondRequest = client.post(registerRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"12345678","username":"dupUser"}
-                    """.trimIndent()
-                )
+                setBody(registerRequest)
             }
 
             // Assert
-            Assertions.assertEquals(HttpStatusCode.Created, first.status)
-            Assertions.assertEquals(HttpStatusCode.Conflict, second.status)
-            Assertions.assertEquals("Email is already used", second.bodyAsText())
+            Assertions.assertEquals(HttpStatusCode.Created, firstRequest.status)
+            Assertions.assertEquals(HttpStatusCode.Conflict, secondRequest.status)
+            Assertions.assertEquals("Email is already used", secondRequest.bodyAsText())
         }
 
         @Test
@@ -269,74 +254,60 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should fail login with wrong password`() = testApplication {
             // Arrange
             setupTestApplication()
-            val email = "wrongpass@pumped.de"
-            val reg = client.post(registerRoute) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"correctPW1","username":"wrongpass"}
-                    """.trimIndent()
-                )
-            }
-            Assertions.assertEquals(HttpStatusCode.Created, reg.status)
 
             // Act
-            val login = client.post(loginRoute) {
+            val loginBody = Json.encodeToString(
+                UserLoginRequest.testRequest().copy(password = "totallyWrong")
+            ).trimIndent()
+            val loginResponse = client.post(loginRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"totallyWrong"}
-                    """.trimIndent()
-                )
+                setBody(loginBody)
             }
 
             // Assert
-            Assertions.assertEquals(HttpStatusCode.BadRequest, login.status)
-            Assertions.assertEquals("Invalid Password", login.bodyAsText())
+            Assertions.assertEquals(HttpStatusCode.BadRequest, loginResponse.status)
+            Assertions.assertEquals("Invalid Password", loginResponse.bodyAsText())
         }
 
         @Test
         @Order(3)
         fun `should fail updating password with wrong old password`() = testApplication {
-            // Arrange
             setupTestApplication()
-            val email = "pwupdate@pumped.de"
-            val reg = client.post(registerRoute) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"oldPass123","username":"pwupdate"}
-                    """.trimIndent()
+            // Arrange
+            val newRegisteredUser =
+                Json.encodeToString(UserRegisterRequest.testRequest().copy(email = "differentEmail@user.de"))
+                    .trimIndent()
+            val newUserLoginRequest =
+                Json.encodeToString(UserLoginRequest.testRequest().copy(email = "differentEmail@user.de")).trimIndent()
+            val updateRequest = Json.encodeToString(
+                UserUpdatePasswordRequest.testRequest().copy(
+                    oldPassword = "wrongPassword"
                 )
+            ).trimIndent()
+            val registerResponse = client.post(registerRoute) {
+                contentType(ContentType.Application.Json)
+                setBody(newRegisteredUser)
             }
-            Assertions.assertEquals(HttpStatusCode.Created, reg.status)
+            Assertions.assertEquals(HttpStatusCode.Created, registerResponse.status)
 
-            val login = client.post(loginRoute) {
+            val loginRequest = client.post(loginRoute) {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"oldPass123"}
-                    """.trimIndent()
-                )
+                setBody(newUserLoginRequest)
             }
-            Assertions.assertEquals(HttpStatusCode.OK, login.status)
-            val loginBody = Json.Default.decodeFromString<UserLoginResponse>(login.bodyAsText())
-            val token = loginBody.token ?: ""
+            Assertions.assertEquals(HttpStatusCode.OK, loginRequest.status)
+            sharedJwtToken = Json.decodeFromString<UserLoginResponse>(loginRequest.bodyAsText()).token ?: "empty token"
+
 
             // Act
-            val update = client.put(passwordUpdateRoute) {
+            val updatePasswordRequest = client.put(passwordUpdateRoute) {
                 contentType(ContentType.Application.Json)
-                header(HttpHeaders.Authorization, "Bearer $token")
-                setBody(
-                    """
-                    {"oldPassword":"WRONG_OLD","newPassword":"newPass999"}
-                    """.trimIndent()
-                )
+                header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
+                setBody(updateRequest)
             }
 
             // Assert
-            Assertions.assertEquals(HttpStatusCode.BadRequest, update.status)
-            Assertions.assertEquals("Invalid Password", update.bodyAsText())
+            Assertions.assertEquals(HttpStatusCode.BadRequest, updatePasswordRequest.status)
+            Assertions.assertEquals("Invalid Password", updatePasswordRequest.bodyAsText())
         }
 
         @Test
@@ -344,42 +315,21 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should fail deleting user with wrong password`() = testApplication {
             // Arrange
             setupTestApplication()
-            val email = "del@pumped.de"
-            val reg = client.post(registerRoute) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"toDelete123","username":"deluser"}
-                    """.trimIndent()
-                )
-            }
-            Assertions.assertEquals(HttpStatusCode.Created, reg.status)
-
-            val login = client.post(loginRoute) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"toDelete123"}
-                    """.trimIndent()
-                )
-            }
-            Assertions.assertEquals(HttpStatusCode.OK, login.status)
-            val token = Json.Default.decodeFromString<UserLoginResponse>(login.bodyAsText()).token ?: ""
+            val deleteRequest = Json.encodeToString(
+                UserDeleteUserRequest.testRequest().copy(password = "WRONG_PASSWORD")
+            ).trimIndent()
 
             // Act
-            val delete = client.delete(userDeletionRoute) {
+
+            val deleteResponse = client.delete(userDeletionRoute) {
                 contentType(ContentType.Application.Json)
-                header(HttpHeaders.Authorization, "Bearer $token")
-                setBody(
-                    """
-                    {"password":"WRONG_PASSWORD"}
-                    """.trimIndent()
-                )
+                header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
+                setBody(deleteRequest)
             }
 
             // Assert
-            Assertions.assertEquals(HttpStatusCode.BadRequest, delete.status)
-            Assertions.assertEquals("Invalid Password", delete.bodyAsText())
+            Assertions.assertEquals(HttpStatusCode.BadRequest, deleteResponse.status)
+            Assertions.assertEquals("Invalid Password", deleteResponse.bodyAsText())
         }
 
         @Test
@@ -387,36 +337,14 @@ class UserIntegrationTest : IntegrationTestBase() {
         fun `should not allow using token after logout`() = testApplication {
             // Arrange
             setupTestApplication()
-            val email = "logout@pumped.de"
-            val reg = client.post(registerRoute) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"logoutMe","username":"logoutuser"}
-                    """.trimIndent()
-                )
-            }
-            Assertions.assertEquals(HttpStatusCode.Created, reg.status)
-
-            val login = client.post(loginRoute) {
-                contentType(ContentType.Application.Json)
-                setBody(
-                    """
-                    {"email":"$email","password":"logoutMe"}
-                    """.trimIndent()
-                )
-            }
-            Assertions.assertEquals(HttpStatusCode.OK, login.status)
-
-            val token = Json.Default.decodeFromString<UserLoginResponse>(login.bodyAsText()).token ?: ""
             val logout = client.delete(logoutRoute) {
-                header(HttpHeaders.Authorization, "Bearer $token")
+                header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
             }
             Assertions.assertEquals(HttpStatusCode.OK, logout.status)
 
             // Act
             val me = client.get(meRoute) {
-                header(HttpHeaders.Authorization, "Bearer $token")
+                header(HttpHeaders.Authorization, "Bearer $sharedJwtToken")
             }
 
             // Assert
