@@ -15,7 +15,7 @@ fun main() {
 fun Application.module(testing: Boolean = false) {
     configureSecrets(testing)
 
-    configureDatabases(testing)
+    configureDatabases()
     configureRabbitMQ()
 
     configureKoin()
