@@ -20,3 +20,10 @@ val validateUserLoginRequest = Validator<UserLoginRequest> {
     password.isNotBlank()
     email.isMatching(Regex("^[\\w\\-]+@([\\w-]+\\.)+[\\w-]{2,}$"))
 }
+
+fun UserLoginRequest.Companion.testRequest(): UserLoginRequest {
+    return UserLoginRequest(
+        email = "test@pumped.de",
+        password = "12345678"
+    )
+}

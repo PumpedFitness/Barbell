@@ -6,6 +6,7 @@ import javax.sql.DataSource
 
 fun Application.configureMigrations(dataSource: DataSource) {
     log.info("Migrating database...")
+
     try {
         val flyway = Flyway
             .configure()
