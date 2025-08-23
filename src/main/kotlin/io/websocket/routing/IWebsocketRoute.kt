@@ -1,7 +1,6 @@
 package ord.pumped.io.websocket.routing
 
 import ord.pumped.io.websocket.routing.messaging.IWebsocketAction
-import ord.pumped.io.websocket.routing.messaging.IWebsocketNotification
 import ord.pumped.io.websocket.routing.messaging.IWebsocketResponse
 import ord.pumped.usecase.user.domain.model.User
 import kotlin.reflect.KClass

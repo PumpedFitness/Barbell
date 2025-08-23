@@ -7,9 +7,12 @@ import io.ktor.server.routing.*
 import ord.pumped.common.request.actions.EmptyAction
 import ord.pumped.common.response.EmptyResponse
 import ord.pumped.common.security.service.SecurityController
+import ord.pumped.configuration.secrets
 import ord.pumped.configuration.tokenID
 import ord.pumped.configuration.userID
 import ord.pumped.configuration.userTokenCookie
+import ord.pumped.io.env.EnvVariables
+import ord.pumped.io.websocket.WebsocketController
 import ord.pumped.io.websocket.routing.routeWebsocket
 import ord.pumped.usecase.user.rest.request.*
 import ord.pumped.usecase.user.rest.request.actions.NotifyUserAction
@@ -29,7 +32,10 @@ fun Route.userRoutingUnauthed() {
                 call.application
             )
 
-            call.response.cookies.append(userTokenCookie(response.token!!))
+            val domain = application.secrets[EnvVariables.BB_JWT_DOMAIN]
+            val isSecure = application.secrets[EnvVariables.BB_MODE] == "PRODUCTION"
+
+            call.response.cookies.append(userTokenCookie(response.token!!, domain, isSecure))
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -74,9 +80,8 @@ fun Route.userRoutingAuthed() {
 
         delete("/logout") {
             UserController.logoutUser(call.tokenID())
+            WebsocketController.destroyWebsocket(call.userID())
             call.respond(HttpStatusCode.OK)
         }
-
     }
-
 }

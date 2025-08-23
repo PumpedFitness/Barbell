@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import ord.pumped.io.websocket.auth.IWebsocketAuthenticator
+import ord.pumped.io.websocket.auth.UUIDResponse
 import ord.pumped.io.websocket.routing.IWebsocketRouter
 import ord.pumped.io.websocket.routing.messaging.BadRequestNotification
 import ord.pumped.io.websocket.routing.messaging.IWebsocketNotification
@@ -25,7 +26,7 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
     private val websocketAuthenticator by inject<IWebsocketAuthenticator>()
     private val websocketRouter by inject<IWebsocketRouter>()
 
-    private val websockets = mutableMapOf<UUID, DefaultWebSocketSession>()
+    private val websockets = mutableMapOf<UUID, BarbellWebsocket>()
     private val websocketCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
     private val json = Json {
         ignoreUnknownKeys = true
@@ -33,18 +34,24 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
     }
 
     override suspend fun handleNewWebsocket(session: DefaultWebSocketSession, call: ApplicationCall) {
-        val user = websocketAuthenticator.authenticate(call) ?: return session.close(unauthorizedCloseReason)
-
         val logger = call.application.log
 
-        registerNewWebsocket(user, session)
+        val websocketSession = BarbellWebsocket(session, false)
 
-        logger.info("New websocket authenticated for user ${user.username}")
+        val id = registerNewWebsocket(websocketSession)
+        sendUUIDNotification(session, id)
+
+        logger.info("New websocket opened")
 
         return coroutineScope {
             async {
                 try {
                     wsLoop@ for (frame in session.incoming) {
+                        if (!isSessionAuthenticated(session)) {
+                            close(session, unauthorizedCloseReason)
+                            return@async
+                        }
+
                         frame as? Frame.Text ?: continue
                         val text = frame.readText()
 
@@ -63,38 +70,43 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
                             continue@wsLoop
                         }
 
-                        val notifications = websocketRouter.routePath(websocketAction.path, data.jsonObject, user)
+                         val user = getUserForSession(session) ?: return@async close(session, unauthorizedCloseReason)
 
+                        val notifications = websocketRouter.routePath(websocketAction.path, data.jsonObject, user)
                         notifications?.let { notifySession(session, it, uuid) }
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 } finally {
-                    logger.info("Websocket closed for user ${user.username}")
-                    close(user.id!!)
+                    close(session)
                 }
             }
         }
     }
 
     override fun registerNewWebsocket(
-        user: User,
-        session: DefaultWebSocketSession
-    ) {
-        if (websockets.keys.any { it == user.id }) {
-            return
+        session: BarbellWebsocket,
+    ): UUID {
+        var id = UUID.randomUUID()
+        while (websockets[id] != null) {
+            id = UUID.randomUUID()
         }
 
-        websockets[user.id!!] = session
+        websockets[id] = session
+        return id
+    }
+
+    private fun sendUUIDNotification(session: DefaultWebSocketSession, id: UUID) {
+        sendToSession(session, UUIDResponse(id.toString()))
     }
 
     override fun sendNotificationToUser(uuid: UUID, notification: IWebsocketNotification) {
-        val session = websockets[uuid] ?: return
-        sendToSession(session, notification)
+        val session = websockets[getSessionIDForUser(uuid)] ?: return
+        sendToSession(session.websocket, notification)
     }
 
     override fun getOnlineUsers(): List<UUID> {
-        return websockets.keys.toList()
+        return websockets.values.mapNotNull { it.user }.map { it.id!! }
     }
 
     override fun sendNotificationToAllUsers(notification: IWebsocketNotification) {
@@ -119,11 +131,29 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
         }
     }
 
-    override fun close(uuid: UUID) {
+    private fun isSessionAuthenticated(session: DefaultWebSocketSession): Boolean {
+        return websockets.values.firstOrNull { it.websocket == session }?.isAuthenticated ?: false
+    }
+
+    private fun getUserForSession(session: DefaultWebSocketSession): User? {
+        return websockets.values.firstOrNull { it.websocket == session }?.user
+    }
+
+    override fun close(session: DefaultWebSocketSession, closeReason: CloseReason) {
+        val socketsToClose = websockets.filter { it.value.websocket == session }
+
         runBlocking {
-            websockets[uuid]?.close(defaultCloseReason)
+            socketsToClose.forEach {
+                it.value.websocket.close(closeReason)
+                websockets.remove(it.key)
+            }
         }
-        websockets.remove(uuid)
+    }
+
+    override fun closeForUser(userID: UUID) {
+        val socketID = getSessionIDForUser(userID)
+        val socket = websockets[socketID]
+        socket?.let { close(it.websocket, defaultCloseReason) }
     }
 
     private fun decodeActionFromString(content: String): DefaultWebsocketAction? {
@@ -134,6 +164,21 @@ class WebsocketHandlerAdapter: IWebsocketHandler, KoinComponent {
             null
         }
     }
+
+    private fun getSessionIDForUser(userID: UUID): UUID? {
+        return websockets.filter { it.value.user?.id == userID }.keys.firstOrNull()
+    }
+
+    override fun hasSession(sessionID: UUID): Boolean {
+        return websockets.keys.any { it == sessionID }
+    }
+
+
+    override fun associateUserWithSocketID(sessionID: UUID, user: User) {
+        val websocket = websockets[sessionID] ?: return
+        websocket.user = user
+        websocket.isAuthenticated = true
+    }
 }
 
 @Serializable
@@ -142,5 +187,11 @@ data class DefaultWebsocketAction(
     val id: String,
 )
 
+data class BarbellWebsocket(
+    val websocket: DefaultWebSocketSession,
+    var isAuthenticated: Boolean,
+    var user: User? = null,
+)
+
 private val unauthorizedCloseReason = CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Unauthorized")
-private val defaultCloseReason = CloseReason(CloseReason.Codes.NORMAL, "Closes by host")
+val defaultCloseReason = CloseReason(CloseReason.Codes.NORMAL, "Closed by host")
