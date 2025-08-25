@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
 class TokenRepository: IRepository<Token, TokenDTO> {
-    override fun save(token: Token): TokenDTO {
+    override fun saveLogic(token: Token): TokenDTO {
         return transaction {
             TokenDTO.new {
                 this.isBlacklisted = token.isBlacklisted
@@ -18,7 +18,7 @@ class TokenRepository: IRepository<Token, TokenDTO> {
         }
     }
 
-    override fun update(token: Token): TokenDTO {
+    override fun updateLogic(token: Token): TokenDTO {
         return transaction {
             TokenDTO.findByIdAndUpdate(token.id) {
                 it.isBlacklisted = token.isBlacklisted
@@ -26,13 +26,13 @@ class TokenRepository: IRepository<Token, TokenDTO> {
         }
     }
 
-    override fun delete(id: UUID) {
+    override fun deleteLogic(id: UUID) {
         return transaction {
             Tokens.deleteWhere { Tokens.id eq id }
         }
     }
 
-    override fun findByID(id: UUID): TokenDTO? {
+    override fun findByIDLogic(id: UUID): TokenDTO? {
         return transaction {
             TokenDTO.findById(id)
         }

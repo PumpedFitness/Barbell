@@ -6,7 +6,7 @@ import io.ktor.server.response.respondText
 import ord.pumped.common.APIException
 
 class UnknownSocketException: APIException("Unknown Socket") {
-    override suspend fun handle(call: ApplicationCall) {
+    override suspend fun handleLogic(call: ApplicationCall) {
         call.respondText("Unknown websocket", status = HttpStatusCode.BadRequest)
     }
 }

@@ -7,7 +7,7 @@ import ord.pumped.common.APIException
 
 class InvalidPasswordException: APIException("Invalid Password") {
 
-    override suspend fun handle(call: ApplicationCall) {
+    override suspend fun handleLogic(call: ApplicationCall) {
         call.respondText("Invalid Password", status = HttpStatusCode.BadRequest)
     }
 
