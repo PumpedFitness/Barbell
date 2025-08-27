@@ -142,7 +142,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("com.h2database:h2:${h2_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testImplementation("io.mockk:mockk:1.14.2")
+    testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiter_version")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiter_version")
     testImplementation("io.insert-koin:koin-test:$koin_version")
