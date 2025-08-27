@@ -14,7 +14,7 @@ val test_container_version: String by project
 val ktor_server_tests_version: String by project
 
 plugins {
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm") version "2.2.10"
     id("io.ktor.plugin") version "3.2.3"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
     id("org.flywaydb.flyway") version "11.11.2"
