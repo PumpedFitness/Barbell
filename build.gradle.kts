@@ -152,7 +152,7 @@ dependencies {
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_server_tests_version")
     testImplementation("io.ktor:ktor-client-cio:$ktor_server_tests_version")
     implementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
-    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2") // ist dependent auf die junit version hat aber ein anderen Release
+    testImplementation("org.junit.platform:junit-platform-launcher:1.13.4") // ist dependent auf die junit version hat aber ein anderen Release
 }
 
 tasks.withType<Test> {
