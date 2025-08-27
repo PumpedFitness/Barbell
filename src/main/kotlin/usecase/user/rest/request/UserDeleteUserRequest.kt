@@ -6,10 +6,3 @@ import kotlinx.serialization.Serializable
 data class UserDeleteUserRequest(
     val password: String
 )
-
-fun UserDeleteUserRequest.Companion.testRequest(): UserDeleteUserRequest {
-    return UserDeleteUserRequest(
-        password = "newPassword123"
-    )
-}
-

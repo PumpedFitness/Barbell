@@ -8,7 +8,6 @@ import ord.pumped.usecase.user.rest.request.*
 import ord.pumped.usecase.user.rest.response.UserLoginResponse
 import ord.pumped.usecase.user.rest.response.UserMeResponse
 import ord.pumped.usecase.user.rest.response.UserRegisterResponse
-import ord.pumped.usecase.user.rest.response.testResponse
 import org.junit.jupiter.api.*
 
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
