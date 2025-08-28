@@ -16,7 +16,7 @@ val ktor_server_tests_version: String by project
 plugins {
     kotlin("jvm") version "2.2.10"
     id("io.ktor.plugin") version "3.2.3"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
     id("org.flywaydb.flyway") version "11.11.2"
     id("com.google.devtools.ksp") version "2.1.21-2.0.2"
 }
